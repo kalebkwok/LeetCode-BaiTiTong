@@ -30,6 +30,8 @@
 - **Obsidian 知识图谱** — 专题总结、题目详解、学习笔记之间通过 `[[wikilink]]` 互链，形成完整知识网络
 - **100 道题目详解** — 每道题包含数据范围分析、多种解法、小白版理解、易错点总结、框架提炼
 
+![知识图谱界面参考](assets/知识图谱界面参考.png)
+
 ## 目录结构
 
 ```
@@ -160,9 +162,8 @@ LeetCode-BaiTiTong/
 
 4. **配置 Claudian 插件**
    - 在 Obsidian 中安装 Claudian 插件，配置 Claude API Key
-   - 打开 `学习中枢.md`，将其中内容复制为 Claudian 的 System Prompt
    - 这样 Claudian 就会化身「算法教练」，自动读取你的学习状态并指导刷题
-
+   
 5. **开始学习**
    - 按照 `01-Raw/02-Hot100两周速通刷题计划.md` 的计划开始 Day 1
    - 在 Claudian 对话中说「开始 Day 1 的学习」，AI 教练会自动接管
