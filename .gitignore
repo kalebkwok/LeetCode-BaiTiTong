@@ -13,5 +13,8 @@ desktop.ini
 *.swp
 *~
 
+# 本地 Git worktree（不纳入仓库）
+.worktrees/
+
 # TRAE 工作目录（临时产物）
 .trae-cn/
