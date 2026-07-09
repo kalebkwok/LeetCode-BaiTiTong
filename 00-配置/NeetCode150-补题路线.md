@@ -9,8 +9,8 @@
 | 项目 | 数量 | 说明 |
 |---|---:|---|
 | NeetCode 150 总题数 | 150 | 已加入 01~12 各专题索引 |
-| 已有本地题解 | 82 | 已自动链接到 `02-Wiki/题目详解` |
-| 待建题解 | 68 | 本路线跟踪原始 77 题，其中 9 题已补齐 |
+| 已有本地题解 | 150 | 全部已链接到 `02-Wiki/题目详解` |
+| 待建题解 | 0 | 原始 77 道待建题解已全部补齐 |
 
 入口：
 
@@ -21,7 +21,7 @@
 
 ## 二、补题原则
 
-1. **先补轻题，建立手感**：Easy 和经典 Medium 优先，先让哈希、双指针、栈、二分这些基础模式顺起来。
+1. **题解已全量补齐，练习按轻题开始**：Easy 和经典 Medium 优先，先让哈希、双指针、栈、二分这些基础模式顺起来。
 2. **每题只补一篇高复盘价值题解**：重点、复杂度、核心模板、易错点放前面；例子放后面。
 3. **每批结束后再更新专题状态**：新建题解后，把对应专题页里的状态从 `待建题解` 改成 `已有题解` 并补链接。
 4. **图论和 DP 不要硬冲**：它们是后半段集中攻坚，不建议一开始连刷。
@@ -114,24 +114,24 @@ AC 不等于掌握。每题做完后立刻补这 6 行：
 
 | 题号 | 题目 | 专题 | 重点 | 状态 |
 |---|---|---|---|---|
-| 217 | Contains Duplicate | [[02-Wiki/专题总结/01-哈希表|哈希表]] | 哈希集合判重 | 待建 |
-| 242 | Valid Anagram | [[02-Wiki/专题总结/01-哈希表|哈希表]] | 字符频次 / 排序比较 | 待建 |
-| 125 | Valid Palindrome | [[02-Wiki/专题总结/02-双指针与滑动窗口|双指针与滑动窗口]] | 左右指针跳过非字母数字 | 待建 |
-| 167 | Two Sum II Input Array Is Sorted | [[02-Wiki/专题总结/02-双指针与滑动窗口|双指针与滑动窗口]] | 有序数组对撞指针 | 待建 |
-| 66 | Plus One | [[02-Wiki/专题总结/03-数组与矩阵|数组与矩阵]] | 从低位模拟进位 | 待建 |
-| 704 | Binary Search | [[02-Wiki/专题总结/09-二分查找|二分查找]] | 标准二分查找 | 待建 |
-| 202 | Happy Number | [[02-Wiki/专题总结/12-技巧专题|技巧专题]] | 哈希集合 / 快慢指针判循环 | 待建 |
-| 191 | Number of 1 Bits | [[02-Wiki/专题总结/12-技巧专题|技巧专题]] | 位计数 / `n & (n-1)` | 待建 |
-| 338 | Counting Bits | [[02-Wiki/专题总结/12-技巧专题|技巧专题]] | 递推统计二进制 1 个数 | 待建 |
-| 190 | Reverse Bits | [[02-Wiki/专题总结/12-技巧专题|技巧专题]] | 逐位反转二进制 | 待建 |
-| 268 | Missing Number | [[02-Wiki/专题总结/12-技巧专题|技巧专题]] | 异或 / 数学求缺失数 | 待建 |
-| 7 | Reverse Integer | [[02-Wiki/专题总结/12-技巧专题|技巧专题]] | 整数反转与溢出处理 | 待建 |
+| 217 | Contains Duplicate | [[02-Wiki/专题总结/01-哈希表|哈希表]] | 哈希集合判重 | 已建 |
+| 242 | Valid Anagram | [[02-Wiki/专题总结/01-哈希表|哈希表]] | 字符频次 / 排序比较 | 已建 |
+| 125 | Valid Palindrome | [[02-Wiki/专题总结/02-双指针与滑动窗口|双指针与滑动窗口]] | 左右指针跳过非字母数字 | 已建 |
+| 167 | Two Sum II Input Array Is Sorted | [[02-Wiki/专题总结/02-双指针与滑动窗口|双指针与滑动窗口]] | 有序数组对撞指针 | 已建 |
+| 66 | Plus One | [[02-Wiki/专题总结/03-数组与矩阵|数组与矩阵]] | 从低位模拟进位 | 已建 |
+| 704 | Binary Search | [[02-Wiki/专题总结/09-二分查找|二分查找]] | 标准二分查找 | 已建 |
+| 202 | Happy Number | [[02-Wiki/专题总结/12-技巧专题|技巧专题]] | 哈希集合 / 快慢指针判循环 | 已建 |
+| 191 | Number of 1 Bits | [[02-Wiki/专题总结/12-技巧专题|技巧专题]] | 位计数 / `n & (n-1)` | 已建 |
+| 338 | Counting Bits | [[02-Wiki/专题总结/12-技巧专题|技巧专题]] | 递推统计二进制 1 个数 | 已建 |
+| 190 | Reverse Bits | [[02-Wiki/专题总结/12-技巧专题|技巧专题]] | 逐位反转二进制 | 已建 |
+| 268 | Missing Number | [[02-Wiki/专题总结/12-技巧专题|技巧专题]] | 异或 / 数学求缺失数 | 已建 |
+| 7 | Reverse Integer | [[02-Wiki/专题总结/12-技巧专题|技巧专题]] | 整数反转与溢出处理 | 已建 |
 | 150 | [[02-Wiki/题目详解/150-逆波兰表达式求值|逆波兰表达式求值]] | [[02-Wiki/专题总结/06-栈与堆|栈与堆]] | 栈模拟逆波兰表达式 | 已建 |
 | 703 | [[02-Wiki/题目详解/703-数据流中的第K大元素|数据流中的第 K 大元素]] | [[02-Wiki/专题总结/06-栈与堆|栈与堆]] | 小顶堆维护第 K 大 | 已建 |
 | 1046 | [[02-Wiki/题目详解/1046-最后一块石头的重量|最后一块石头的重量]] | [[02-Wiki/专题总结/06-栈与堆|栈与堆]] | 大顶堆模拟粉碎石头 | 已建 |
-| 746 | Min Cost Climbing Stairs | [[02-Wiki/专题总结/10-动态规划|动态规划]] | 到达台阶的最小代价 DP | 待建 |
-| 110 | Balanced Binary Tree | [[02-Wiki/专题总结/05-二叉树|二叉树]] | 后序检查高度平衡 | 待建 |
-| 100 | Same Tree | [[02-Wiki/专题总结/05-二叉树|二叉树]] | 同步递归比较两棵树 | 待建 |
+| 746 | Min Cost Climbing Stairs | [[02-Wiki/专题总结/10-动态规划|动态规划]] | 到达台阶的最小代价 DP | 已建 |
+| 110 | Balanced Binary Tree | [[02-Wiki/专题总结/05-二叉树|二叉树]] | 后序检查高度平衡 | 已建 |
+| 100 | Same Tree | [[02-Wiki/专题总结/05-二叉树|二叉树]] | 同步递归比较两棵树 | 已建 |
 
 ---
 
@@ -141,24 +141,24 @@ AC 不等于掌握。每题做完后立刻补这 6 行：
 
 | 题号 | 题目 | 专题 | 重点 | 状态 |
 |---|---|---|---|---|
-| 424 | Longest Repeating Character Replacement | [[02-Wiki/专题总结/02-双指针与滑动窗口|双指针与滑动窗口]] | 窗口内最高频字符约束 | 待建 |
-| 567 | Permutation In String | [[02-Wiki/专题总结/02-双指针与滑动窗口|双指针与滑动窗口]] | 定长窗口字符频次匹配 | 待建 |
-| 36 | Valid Sudoku | [[02-Wiki/专题总结/03-数组与矩阵|数组与矩阵]] | 行 / 列 / 宫哈希去重 | 待建 |
-| 57 | Insert Interval | [[02-Wiki/专题总结/03-数组与矩阵|数组与矩阵]] | 插入新区间后合并 | 待建 |
-| 435 | Non Overlapping Intervals | [[02-Wiki/专题总结/03-数组与矩阵|数组与矩阵]] | 按右端点贪心删除重叠 | 待建 |
-| 252 | Meeting Rooms | [[02-Wiki/专题总结/03-数组与矩阵|数组与矩阵]] | 按开始时间排序检查重叠 | 待建 |
-| 253 | Meeting Rooms II | [[02-Wiki/专题总结/03-数组与矩阵|数组与矩阵]] | 扫描线 / 最小堆统计会议室 | 待建 |
-| 143 | Reorder List | [[02-Wiki/专题总结/04-链表|链表]] | 找中点 + 反转后半 + 交错合并 | 待建 |
-| 572 | Subtree of Another Tree | [[02-Wiki/专题总结/05-二叉树|二叉树]] | 子树匹配递归 | 待建 |
-| 235 | Lowest Common Ancestor of a Binary Search Tree | [[02-Wiki/专题总结/05-二叉树|二叉树]] | 利用 BST 有序性找分叉点 | 待建 |
-| 1448 | Count Good Nodes In Binary Tree | [[02-Wiki/专题总结/05-二叉树|二叉树]] | DFS 维护路径最大值 | 待建 |
+| 424 | Longest Repeating Character Replacement | [[02-Wiki/专题总结/02-双指针与滑动窗口|双指针与滑动窗口]] | 窗口内最高频字符约束 | 已建 |
+| 567 | Permutation In String | [[02-Wiki/专题总结/02-双指针与滑动窗口|双指针与滑动窗口]] | 定长窗口字符频次匹配 | 已建 |
+| 36 | Valid Sudoku | [[02-Wiki/专题总结/03-数组与矩阵|数组与矩阵]] | 行 / 列 / 宫哈希去重 | 已建 |
+| 57 | Insert Interval | [[02-Wiki/专题总结/03-数组与矩阵|数组与矩阵]] | 插入新区间后合并 | 已建 |
+| 435 | Non Overlapping Intervals | [[02-Wiki/专题总结/03-数组与矩阵|数组与矩阵]] | 按右端点贪心删除重叠 | 已建 |
+| 252 | Meeting Rooms | [[02-Wiki/专题总结/03-数组与矩阵|数组与矩阵]] | 按开始时间排序检查重叠 | 已建 |
+| 253 | Meeting Rooms II | [[02-Wiki/专题总结/03-数组与矩阵|数组与矩阵]] | 扫描线 / 最小堆统计会议室 | 已建 |
+| 143 | Reorder List | [[02-Wiki/专题总结/04-链表|链表]] | 找中点 + 反转后半 + 交错合并 | 已建 |
+| 572 | Subtree of Another Tree | [[02-Wiki/专题总结/05-二叉树|二叉树]] | 子树匹配递归 | 已建 |
+| 235 | Lowest Common Ancestor of a Binary Search Tree | [[02-Wiki/专题总结/05-二叉树|二叉树]] | 利用 BST 有序性找分叉点 | 已建 |
+| 1448 | Count Good Nodes In Binary Tree | [[02-Wiki/专题总结/05-二叉树|二叉树]] | DFS 维护路径最大值 | 已建 |
 | 853 | [[02-Wiki/题目详解/853-车队|车队]] | [[02-Wiki/专题总结/06-栈与堆|栈与堆]] | 按位置排序后合并车队 | 已建 |
 | 973 | [[02-Wiki/题目详解/973-最接近原点的K个点|最接近原点的 K 个点]] | [[02-Wiki/专题总结/06-栈与堆|栈与堆]] | 按距离建堆 / 快速选择 | 已建 |
 | 40 | [[02-Wiki/题目详解/40-组合总和II|组合总和 II]] | [[02-Wiki/专题总结/08-回溯算法|回溯算法]] | 不可重复选择 + 同层去重 | 已建 |
 | 90 | [[02-Wiki/题目详解/90-子集II|子集 II]] | [[02-Wiki/专题总结/08-回溯算法|回溯算法]] | 排序后同层去重枚举子集 | 已建 |
-| 875 | Koko Eating Bananas | [[02-Wiki/专题总结/09-二分查找|二分查找]] | 答案二分最小速度 | 待建 |
-| 981 | Time Based Key Value Store | [[02-Wiki/专题总结/09-二分查找|二分查找]] | 哈希表 + 时间戳二分 | 待建 |
-| 134 | Gas Station | [[02-Wiki/专题总结/11-贪心算法|贪心算法]] | 总油量 + 当前油量贪心 | 待建 |
+| 875 | Koko Eating Bananas | [[02-Wiki/专题总结/09-二分查找|二分查找]] | 答案二分最小速度 | 已建 |
+| 981 | Time Based Key Value Store | [[02-Wiki/专题总结/09-二分查找|二分查找]] | 哈希表 + 时间戳二分 | 已建 |
+| 134 | Gas Station | [[02-Wiki/专题总结/11-贪心算法|贪心算法]] | 总油量 + 当前油量贪心 | 已建 |
 
 ---
 
@@ -168,23 +168,23 @@ AC 不等于掌握。每题做完后立刻补这 6 行：
 
 | 题号 | 题目 | 专题 | 重点 | 状态 |
 |---|---|---|---|---|
-| 271 | Encode and Decode Strings | [[02-Wiki/专题总结/01-哈希表|哈希表]] | 长度前缀编码与解码 | 待建 |
-| 43 | Multiply Strings | [[02-Wiki/专题总结/03-数组与矩阵|数组与矩阵]] | 字符串乘法竖式模拟 | 待建 |
-| 2013 | Detect Squares | [[02-Wiki/专题总结/03-数组与矩阵|数组与矩阵]] | 哈希计数枚举对角点 | 待建 |
-| 297 | Serialize And Deserialize Binary Tree | [[02-Wiki/专题总结/05-二叉树|二叉树]] | 序列化与反序列化递归 | 待建 |
+| 271 | Encode and Decode Strings | [[02-Wiki/专题总结/01-哈希表|哈希表]] | 长度前缀编码与解码 | 已建 |
+| 43 | Multiply Strings | [[02-Wiki/专题总结/03-数组与矩阵|数组与矩阵]] | 字符串乘法竖式模拟 | 已建 |
+| 2013 | Detect Squares | [[02-Wiki/专题总结/03-数组与矩阵|数组与矩阵]] | 哈希计数枚举对角点 | 已建 |
+| 297 | Serialize And Deserialize Binary Tree | [[02-Wiki/专题总结/05-二叉树|二叉树]] | 序列化与反序列化递归 | 已建 |
 | 621 | [[02-Wiki/题目详解/621-任务调度器|任务调度器]] | [[02-Wiki/专题总结/06-栈与堆|栈与堆]] | 任务频率贪心 / 堆模拟 | 已建 |
 | 355 | [[02-Wiki/题目详解/355-设计推特|设计推特]] | [[02-Wiki/专题总结/06-栈与堆|栈与堆]] | 哈希表 + 堆合并动态流 | 已建 |
-| 211 | Design Add And Search Words Data Structure | [[02-Wiki/专题总结/07-图论|图论]] | Trie + 通配符 DFS | 待建 |
-| 695 | Max Area of Island | [[02-Wiki/专题总结/07-图论|图论]] | 网格 DFS 求最大连通面积 | 待建 |
-| 133 | Clone Graph | [[02-Wiki/专题总结/07-图论|图论]] | 哈希表克隆图节点 | 待建 |
-| 286 | Walls And Gates | [[02-Wiki/专题总结/07-图论|图论]] | 多源 BFS 填最近门距离 | 待建 |
-| 417 | Pacific Atlantic Water Flow | [[02-Wiki/专题总结/07-图论|图论]] | 反向 DFS / BFS 找可达交集 | 待建 |
-| 130 | Surrounded Regions | [[02-Wiki/专题总结/07-图论|图论]] | 从边界出发标记安全区域 | 待建 |
-| 210 | Course Schedule II | [[02-Wiki/专题总结/07-图论|图论]] | 拓扑排序输出课程顺序 | 待建 |
-| 261 | Graph Valid Tree | [[02-Wiki/专题总结/07-图论|图论]] | 并查集 / DFS 判树 | 待建 |
-| 323 | Number of Connected Components In An Undirected Graph | [[02-Wiki/专题总结/07-图论|图论]] | 并查集 / DFS 统计连通分量 | 待建 |
-| 684 | Redundant Connection | [[02-Wiki/专题总结/07-图论|图论]] | 并查集找成环边 | 待建 |
-| 846 | Hand of Straights | [[02-Wiki/专题总结/11-贪心算法|贪心算法]] | 排序后按最小牌开组 | 待建 |
+| 211 | Design Add And Search Words Data Structure | [[02-Wiki/专题总结/07-图论|图论]] | Trie + 通配符 DFS | 已建 |
+| 695 | Max Area of Island | [[02-Wiki/专题总结/07-图论|图论]] | 网格 DFS 求最大连通面积 | 已建 |
+| 133 | Clone Graph | [[02-Wiki/专题总结/07-图论|图论]] | 哈希表克隆图节点 | 已建 |
+| 286 | Walls And Gates | [[02-Wiki/专题总结/07-图论|图论]] | 多源 BFS 填最近门距离 | 已建 |
+| 417 | Pacific Atlantic Water Flow | [[02-Wiki/专题总结/07-图论|图论]] | 反向 DFS / BFS 找可达交集 | 已建 |
+| 130 | Surrounded Regions | [[02-Wiki/专题总结/07-图论|图论]] | 从边界出发标记安全区域 | 已建 |
+| 210 | Course Schedule II | [[02-Wiki/专题总结/07-图论|图论]] | 拓扑排序输出课程顺序 | 已建 |
+| 261 | Graph Valid Tree | [[02-Wiki/专题总结/07-图论|图论]] | 并查集 / DFS 判树 | 已建 |
+| 323 | Number of Connected Components In An Undirected Graph | [[02-Wiki/专题总结/07-图论|图论]] | 并查集 / DFS 统计连通分量 | 已建 |
+| 684 | Redundant Connection | [[02-Wiki/专题总结/07-图论|图论]] | 并查集找成环边 | 已建 |
+| 846 | Hand of Straights | [[02-Wiki/专题总结/11-贪心算法|贪心算法]] | 排序后按最小牌开组 | 已建 |
 
 ---
 
@@ -194,14 +194,14 @@ AC 不等于掌握。每题做完后立刻补这 6 行：
 
 | 题号 | 题目 | 专题 | 重点 | 状态 |
 |---|---|---|---|---|
-| 212 | Word Search II | [[02-Wiki/专题总结/07-图论|图论]] | Trie 剪枝 + 网格 DFS | 待建 |
-| 127 | Word Ladder | [[02-Wiki/专题总结/07-图论|图论]] | BFS 最短转换路径 | 待建 |
-| 743 | Network Delay Time | [[02-Wiki/专题总结/07-图论|图论]] | Dijkstra 单源最短路 | 待建 |
-| 332 | Reconstruct Itinerary | [[02-Wiki/专题总结/07-图论|图论]] | 欧拉路径 + 后序回溯 | 待建 |
-| 1584 | Min Cost to Connect All Points | [[02-Wiki/专题总结/07-图论|图论]] | 最小生成树 Kruskal / Prim | 待建 |
-| 778 | Swim In Rising Water | [[02-Wiki/专题总结/07-图论|图论]] | 最短路 / 并查集 / 答案二分 | 待建 |
-| 269 | Alien Dictionary | [[02-Wiki/专题总结/07-图论|图论]] | 字符图拓扑排序 | 待建 |
-| 787 | Cheapest Flights Within K Stops | [[02-Wiki/专题总结/07-图论|图论]] | 限制步数最短路 DP / Bellman-Ford | 待建 |
+| 212 | Word Search II | [[02-Wiki/专题总结/07-图论|图论]] | Trie 剪枝 + 网格 DFS | 已建 |
+| 127 | Word Ladder | [[02-Wiki/专题总结/07-图论|图论]] | BFS 最短转换路径 | 已建 |
+| 743 | Network Delay Time | [[02-Wiki/专题总结/07-图论|图论]] | Dijkstra 单源最短路 | 已建 |
+| 332 | Reconstruct Itinerary | [[02-Wiki/专题总结/07-图论|图论]] | 欧拉路径 + 后序回溯 | 已建 |
+| 1584 | Min Cost to Connect All Points | [[02-Wiki/专题总结/07-图论|图论]] | 最小生成树 Kruskal / Prim | 已建 |
+| 778 | Swim In Rising Water | [[02-Wiki/专题总结/07-图论|图论]] | 最短路 / 并查集 / 答案二分 | 已建 |
+| 269 | Alien Dictionary | [[02-Wiki/专题总结/07-图论|图论]] | 字符图拓扑排序 | 已建 |
+| 787 | Cheapest Flights Within K Stops | [[02-Wiki/专题总结/07-图论|图论]] | 限制步数最短路 DP / Bellman-Ford | 已建 |
 
 ---
 
@@ -211,17 +211,17 @@ AC 不等于掌握。每题做完后立刻补这 6 行：
 
 | 题号 | 题目 | 专题 | 重点 | 状态 |
 |---|---|---|---|---|
-| 213 | House Robber II | [[02-Wiki/专题总结/10-动态规划|动态规划]] | 环形房屋拆成两段 DP | 待建 |
-| 647 | Palindromic Substrings | [[02-Wiki/专题总结/10-动态规划|动态规划]] | 中心扩展统计回文子串 | 待建 |
-| 91 | Decode Ways | [[02-Wiki/专题总结/10-动态规划|动态规划]] | 按一位 / 两位解码 DP | 待建 |
-| 309 | Best Time to Buy And Sell Stock With Cooldown | [[02-Wiki/专题总结/10-动态规划|动态规划]] | 股票状态机 DP | 待建 |
-| 518 | Coin Change II | [[02-Wiki/专题总结/10-动态规划|动态规划]] | 完全背包组合数 | 待建 |
-| 494 | Target Sum | [[02-Wiki/专题总结/10-动态规划|动态规划]] | 转换为子集和计数 | 待建 |
-| 97 | Interleaving String | [[02-Wiki/专题总结/10-动态规划|动态规划]] | 二维交错匹配 DP | 待建 |
-| 329 | Longest Increasing Path In a Matrix | [[02-Wiki/专题总结/10-动态规划|动态规划]] | 记忆化 DFS / DAG DP | 待建 |
-| 115 | Distinct Subsequences | [[02-Wiki/专题总结/10-动态规划|动态规划]] | 子序列计数 DP | 待建 |
-| 312 | Burst Balloons | [[02-Wiki/专题总结/10-动态规划|动态规划]] | 区间 DP 戳气球 | 待建 |
-| 10 | Regular Expression Matching | [[02-Wiki/专题总结/10-动态规划|动态规划]] | 正则匹配二维 DP | 待建 |
+| 213 | House Robber II | [[02-Wiki/专题总结/10-动态规划|动态规划]] | 环形房屋拆成两段 DP | 已建 |
+| 647 | Palindromic Substrings | [[02-Wiki/专题总结/10-动态规划|动态规划]] | 中心扩展统计回文子串 | 已建 |
+| 91 | Decode Ways | [[02-Wiki/专题总结/10-动态规划|动态规划]] | 按一位 / 两位解码 DP | 已建 |
+| 309 | Best Time to Buy And Sell Stock With Cooldown | [[02-Wiki/专题总结/10-动态规划|动态规划]] | 股票状态机 DP | 已建 |
+| 518 | Coin Change II | [[02-Wiki/专题总结/10-动态规划|动态规划]] | 完全背包组合数 | 已建 |
+| 494 | Target Sum | [[02-Wiki/专题总结/10-动态规划|动态规划]] | 转换为子集和计数 | 已建 |
+| 97 | Interleaving String | [[02-Wiki/专题总结/10-动态规划|动态规划]] | 二维交错匹配 DP | 已建 |
+| 329 | Longest Increasing Path In a Matrix | [[02-Wiki/专题总结/10-动态规划|动态规划]] | 记忆化 DFS / DAG DP | 已建 |
+| 115 | Distinct Subsequences | [[02-Wiki/专题总结/10-动态规划|动态规划]] | 子序列计数 DP | 已建 |
+| 312 | Burst Balloons | [[02-Wiki/专题总结/10-动态规划|动态规划]] | 区间 DP 戳气球 | 已建 |
+| 10 | Regular Expression Matching | [[02-Wiki/专题总结/10-动态规划|动态规划]] | 正则匹配二维 DP | 已建 |
 
 ---
 
@@ -231,11 +231,11 @@ AC 不等于掌握。每题做完后立刻补这 6 行：
 
 | 题号 | 题目 | 专题 | 重点 | 状态 |
 |---|---|---|---|---|
-| 1851 | Minimum Interval to Include Each Query | [[02-Wiki/专题总结/03-数组与矩阵|数组与矩阵]] | 按查询排序 + 堆维护候选区间 | 待建 |
-| 50 | Pow(x, n) | [[02-Wiki/专题总结/12-技巧专题|技巧专题]] | 快速幂 / 二分递归 | 待建 |
-| 371 | Sum of Two Integers | [[02-Wiki/专题总结/12-技巧专题|技巧专题]] | 位运算模拟加法 | 待建 |
-| 1899 | Merge Triplets to Form Target Triplet | [[02-Wiki/专题总结/11-贪心算法|贪心算法]] | 逐维判断是否可覆盖目标 | 待建 |
-| 678 | Valid Parenthesis String | [[02-Wiki/专题总结/11-贪心算法|贪心算法]] | 左右括号可行区间贪心 | 待建 |
+| 1851 | Minimum Interval to Include Each Query | [[02-Wiki/专题总结/03-数组与矩阵|数组与矩阵]] | 按查询排序 + 堆维护候选区间 | 已建 |
+| 50 | Pow(x, n) | [[02-Wiki/专题总结/12-技巧专题|技巧专题]] | 快速幂 / 二分递归 | 已建 |
+| 371 | Sum of Two Integers | [[02-Wiki/专题总结/12-技巧专题|技巧专题]] | 位运算模拟加法 | 已建 |
+| 1899 | Merge Triplets to Form Target Triplet | [[02-Wiki/专题总结/11-贪心算法|贪心算法]] | 逐维判断是否可覆盖目标 | 已建 |
+| 678 | Valid Parenthesis String | [[02-Wiki/专题总结/11-贪心算法|贪心算法]] | 左右括号可行区间贪心 | 已建 |
 
 ---
 
