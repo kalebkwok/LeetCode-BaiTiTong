@@ -1,181 +1,100 @@
-"""Local website + SQLite API. No installation, account or external service."""
+"""Stable local launcher for the single-worker FastAPI application."""
 import argparse
-import functools
 import json
-import secrets
-import sqlite3
+import os
 import threading
+import time
 import urllib.error
-import urllib.parse
 import urllib.request
 import webbrowser
-from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
-from database import Database, StoreError, MAX_BYTES
-from data_lock import DataLease
-
 BASE = Path(__file__).resolve().parent
-URL = 'http://127.0.0.1:8765/'
 
 
 def catalog():
-    result = {}
-    for t in json.loads((BASE / 'topics.json').read_text()):
-        for c in json.loads((BASE / t['content']).read_text()):
-            result[c['uid']] = {'topicId': t['id'], 'title': c['title']}
-    return result
+    # Retain the old test/import entry point; the API owns catalog loading.
+    from backend.api import catalog as load_catalog
+    return load_catalog()
 
 
-class ReviewServer(ThreadingHTTPServer):
-    daemon_threads = True
-    def __init__(self, address, database):
-        self.database = database
-        self.token = secrets.token_urlsafe(32)
-        super().__init__(address, functools.partial(Handler, directory=str(BASE / 'dist')))
-
-
-class Handler(SimpleHTTPRequestHandler):
-    def log_message(self, fmt, *args):
-        # Normal requests are quiet; failures remain visible for troubleshooting.
-        if len(args) > 1 and str(args[1]) not in ('200', '304'):
-            super().log_message(fmt, *args)
-
-    def end_headers(self):
-        self.send_header('Cache-Control', 'no-store')
-        self.send_header('X-Content-Type-Options', 'nosniff')
-        self.send_header('Referrer-Policy', 'same-origin')
-        self.send_header('X-Frame-Options', 'DENY')
-        super().end_headers()
-
-    def _guard(self, token=True):
-        port = self.server.server_address[1]
-        allowed = {f'127.0.0.1:{port}', f'localhost:{port}'}
-        if self.headers.get('Host') not in allowed:
-            raise StoreError('此服务仅供本机访问。', 403)
-        origin = self.headers.get('Origin')
-        if origin and origin not in {'http://' + a for a in allowed}:
-            raise StoreError('请求来源无效。', 403)
-        if token and not secrets.compare_digest(self.headers.get('X-Review-Token', ''), self.server.token):
-            raise StoreError('连接已更新，请重新连接本地服务。', 401)
-
-    def _json(self, data, status=200):
-        body = json.dumps(data, ensure_ascii=False).encode()
-        self.send_response(status)
-        self.send_header('Content-Type', 'application/json; charset=utf-8')
-        self.send_header('Content-Length', str(len(body)))
-        self.end_headers()
-        self.wfile.write(body)
-
-    def _error(self, exc):
-        if isinstance(exc, StoreError):
-            self._json({'error': str(exc), 'detail': exc.detail}, exc.status)
-        else:
-            self._json({'error': '本地保存未完成，请检查磁盘空间或数据库是否可写，然后重试。'}, 503)
-            print('本地服务错误：', repr(exc), flush=True)
-
-    def do_GET(self):
-        parsed = urllib.parse.urlsplit(self.path)
-        try:
-            self._guard(token=parsed.path.startswith('/api/') and parsed.path != '/api/session')
-            if not parsed.path.startswith('/api/'):
-                return super().do_GET()
-            db = self.server.database
-            if parsed.path == '/api/session':
-                return self._json({'app': 'shiyi-leetcode-review', 'apiVersion': 2, 'token': self.server.token, 'dataDirectory': str(db.directory)})
-            if parsed.path == '/api/state':
-                return self._json(db.snapshot())
-            if parsed.path == '/api/status':
-                return self._json(db.status())
-            if parsed.path == '/api/learning':
-                return self._json(db.learning())
-            if parsed.path == '/api/history':
-                query = urllib.parse.parse_qs(parsed.query)
-                try:
-                    before = int(query['before'][0]) if 'before' in query else None
-                except (ValueError, IndexError):
-                    raise StoreError('历史页码无效。')
-                return self._json(db.history(before, uid=query.get('uid', [None])[0]))
-            if parsed.path == '/api/export':
-                return self._json(db.export())
-            raise StoreError('找不到这个接口。', 404)
-        except (StoreError, sqlite3.Error, OSError) as exc:
-            self._error(exc)
-
-    def do_POST(self):
-        try:
-            self._guard()
-            if self.headers.get_content_type() != 'application/json':
-                raise StoreError('只接受 JSON 数据。', 415)
-            try:
-                length = int(self.headers.get('Content-Length', '0'))
-            except ValueError:
-                raise StoreError('数据长度无效。')
-            if not 0 < length <= MAX_BYTES:
-                raise StoreError('备份或保存请求超过 16 MB。', 413)
-            try:
-                data = json.loads(self.rfile.read(length))
-            except (ValueError, UnicodeError):
-                raise StoreError('不是有效的 JSON 数据。')
-            path = urllib.parse.urlsplit(self.path).path
-            if path == '/api/command':
-                return self._json(self.server.database.mutate(data))
-            if path == '/api/backup':
-                name = self.server.database.backup()
-                return self._json({'name': name, **self.server.database.status()})
-            raise StoreError('找不到这个接口。', 404)
-        except (StoreError, sqlite3.Error, OSError) as exc:
-            self._error(exc)
-
-    def do_OPTIONS(self):
-        self.send_error(403, 'Cross-origin requests are not allowed')
+def load_config(path=BASE / 'launch.local.json'):
+    """Optional local-only settings, also used by the double-click launcher."""
+    if not path.exists():
+        return {}
+    config = json.loads(path.read_text())
+    fields = {'port', 'dataDir', 'timeZone', 'allowedHosts', 'allowedOrigins'}
+    if not isinstance(config, dict) or set(config) - fields:
+        raise ValueError('启动配置必须是 JSON 对象，只含 port/dataDir/timeZone/allowedHosts/allowedOrigins。')
+    if 'port' in config and (type(config['port']) is not int or not 1 <= config['port'] <= 65535):
+        raise ValueError('启动配置 port 必须为 1 到 65535 的整数。')
+    for key in ('dataDir', 'timeZone'):
+        if key in config and (not isinstance(config[key], str) or not config[key]):
+            raise ValueError(f'启动配置 {key} 必须是非空字符串。')
+    for key in ('allowedHosts', 'allowedOrigins'):
+        if key in config and (not isinstance(config[key], list) or any(not isinstance(v, str) for v in config[key])):
+            raise ValueError(f'启动配置 {key} 必须是地址列表。')
+    return config
 
 
 def main():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description=__doc__)
+    try:
+        config = load_config()
+    except (OSError, ValueError) as exc:
+        parser.exit(1, f'无法读取 launch.local.json：{exc}\n')
     parser.add_argument('--no-open', action='store_true')
-    parser.add_argument('--port', type=int, default=8765)
-    parser.add_argument('--data-dir', type=Path, default=BASE / 'data', help='Default: data/review.sqlite3 beside the launcher')
+    parser.add_argument('--port', type=int, default=config.get('port', 8765))
+    parser.add_argument('--data-dir', type=Path, default=BASE / config.get('dataDir', 'data'))
+    parser.add_argument('--time-zone', default=os.environ.get('SHIYI_TIME_ZONE', config.get('timeZone')))
+    parser.add_argument('--allow-host', action='append', default=config.get('allowedHosts', []))
+    parser.add_argument('--allow-origin', action='append', default=config.get('allowedOrigins', []))
     args = parser.parse_args()
+    if not 1 <= args.port <= 65535:
+        parser.error('--port 必须在 1 到 65535 之间。')
+    try:
+        import uvicorn
+        from backend.api import create_app
+    except ImportError:
+        parser.exit(1, '缺少 Python 环境，请按 README 创建 .venv 并安装 requirements.lock。\n')
+    if not (BASE / 'frontend/dist/index.html').is_file():
+        parser.exit(1, '缺少前端构建。请先在 frontend 中运行 npm ci 和 npm run build。\n')
     url = f'http://127.0.0.1:{args.port}/'
-    # Check only the requested local origin; never silently switch ports or data folders.
+    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
     try:
-        with urllib.request.urlopen(url + 'api/session', timeout=1) as r:
-            existing = json.load(r)
-        if existing.get('app') == 'shiyi-leetcode-review' and existing.get('apiVersion') == 2:
-            if existing.get('dataDirectory') != str(args.data_dir.resolve()):
-                print('这个端口的拾忆使用了另一数据目录，请换一个端口或关闭该实例。')
-                raise SystemExit(1)
-            print('拾忆已在运行：' + url)
-            if not args.no_open:
-                webbrowser.open(url)
-            return
+        with opener.open(url + 'api/session', timeout=1) as response:
+            existing = json.load(response)
     except (urllib.error.URLError, ValueError, OSError):
-        pass
-    try:
-        with DataLease(args.data_dir):
-            database = Database(args.data_dir, catalog())
-            try:
-                server = ReviewServer(('127.0.0.1', args.port), database)
-            except OSError as exc:
-                print(f'{args.port} 端口无法启动。若旧版拾忆仍在运行，请关闭旧启动窗口后再打开。\n{exc}')
-                raise SystemExit(1)
-            print('拾忆 · 本地算法复习：' + url, flush=True)
-            print('学习数据：' + str(database.path), flush=True)
-            print('进度与草稿自动保存；关闭此窗口停止服务。', flush=True)
-            if not args.no_open:
-                threading.Timer(0.5, lambda: webbrowser.open(url)).start()
-            try:
-                server.serve_forever()
-            except KeyboardInterrupt:
-                pass
-            finally:
-                server.server_close()
-                database._automatic_backup(force=True)
-    except (sqlite3.Error, StoreError, OSError, RuntimeError) as exc:
-        print('无法安全打开数据库，原文件未被删除：' + str(exc))
-        print('数据库目录：' + str(args.data_dir.resolve()))
-        print('请按 README 的“数据库损坏时恢复”说明，用 backups 中的备份恢复。')
+        existing = {}
+    if existing.get('app') == 'shiyi-leetcode-review' and existing.get('apiVersion') == 2:
+        if existing.get('dataDirectory') != str(args.data_dir.resolve()):
+            parser.exit(1, '这个端口的拾忆使用了另一数据目录，请换端口或关闭对应实例。\n')
+        if args.time_zone and existing.get('timeZone') != args.time_zone:
+            parser.exit(1, '已运行实例的学习时区不同，请关闭该实例后重新启动。\n')
+        print('拾忆已在运行：' + url)
+        if not args.no_open:
+            webbrowser.open(url)
+        return
+    hosts = [f'127.0.0.1:{args.port}', f'localhost:{args.port}', *args.allow_host]
+    origins = [f'http://127.0.0.1:{args.port}', f'http://localhost:{args.port}', *args.allow_origin]
+    app = create_app(args.data_dir, allowed_hosts=hosts, allowed_origins=origins,
+                     time_zone=args.time_zone)
+    server = uvicorn.Server(uvicorn.Config(app, host='127.0.0.1', port=args.port,
+                            workers=1, proxy_headers=False, access_log=False))
+    if not args.no_open:
+        def open_when_ready():
+            for _ in range(100):
+                if server.started:
+                    webbrowser.open(url)
+                    return
+                if server.should_exit:
+                    return
+                time.sleep(0.1)
+        threading.Thread(target=open_when_ready, daemon=True).start()
+    print('拾忆 · 共享学习进度：' + url, flush=True)
+    print('学习数据目录：' + str(args.data_dir.resolve()), flush=True)
+    server.run()
+    if not server.started:
         raise SystemExit(1)
 
 

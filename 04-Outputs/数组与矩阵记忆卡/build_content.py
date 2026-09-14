@@ -1,4 +1,5 @@
 """Compile topic records and original Markdown solutions into an offline library."""
+import argparse
 import ast
 import hashlib
 import html
@@ -12,7 +13,11 @@ ROOT = HERE.parent.parent
 REQUIRED = ('uid','id','group','title','level','prompt','example','hint','mnemonic','why',
             'steps','trace','trap','complexity','recognition','invariant','prerequisites','related','followup','source')
 
-def build():
+def build(output_dir=None, format='json', app_url=None):
+    output = Path(output_dir) if output_dir else HERE / 'frontend/public/content'
+    output.mkdir(parents=True, exist_ok=True)
+    (output / 'notes').mkdir(exist_ok=True)
+    app_url = app_url or ('/' if format == 'json' else '../index.html')
     topics = json.loads((HERE / 'topics.json').read_text())
     all_ids = set()
     for topic in topics:
@@ -41,21 +46,25 @@ def build():
             parsed = ast.parse(card['code'],str(path))
             assert any(isinstance(node, (ast.FunctionDef, ast.ClassDef)) for node in parsed.body), f'Incomplete solution: {path}'
             card['url'] = re.search(r'https://\S+',source).group(0)
-            card['noteUrl'] = 'obsidian://open?vault=LeetCode-BaiTiTong&file='+quote(card['source'])
+            card['noteUrl'] = (f"/content/notes/{card['uid']}.html" if format == 'json' else
+                               'obsidian://open?vault=LeetCode-BaiTiTong&file='+quote(card['source']))
             card['sourceHash'] = hashlib.sha256(source.encode()).hexdigest()
-            (HERE/'dist/notes').mkdir(exist_ok=True)
             escaped = html.escape(source)
-            (HERE/f"dist/notes/{card['uid']}.html").write_text(
+            (output/f"notes/{card['uid']}.html").write_text(
                 '<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
                 f'<title>{html.escape(card["title"])} · 原题解</title>'
                 '<style>body{max-width:900px;margin:40px auto;padding:0 22px;color:#172136;background:#f7f9fd;font:16px/1.9 system-ui}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit}a{color:#244bd6}</style>'
-                '<a href="../index.html">返回记忆卡</a><p>本地 Markdown 题解快照；最新版本请在 Obsidian 中查看。</p>'
+                f'<a href="{html.escape(app_url, quote=True)}">返回记忆卡</a><p>本地 Markdown 题解快照；最新版本请在 Obsidian 中查看。</p>'
                 f'<pre>{escaped}</pre></html>')
     for topic in topics:
         for card in topic['cards']:
             assert all(f"lc-{r['id']}" in all_ids for r in card['related'])
     library = {'version':1,'topics':topics}
-    (HERE/'dist/cards.js').write_text('window.REVIEW_LIBRARY = '+json.dumps(library,ensure_ascii=False,indent=2)+';\n')
+    serialized = json.dumps(library,ensure_ascii=False,indent=2)
+    if format == 'json':
+        (output/'library.json').write_text(serialized+'\n')
+    else:
+        (output/'cards.js').write_text('window.REVIEW_LIBRARY = '+serialized+';\n')
     sheet = ['# 数组与矩阵 · 记忆速查表','','每天最多 3 道新题。先遮住答案复述，再核对；每天选 1 道合上答案写代码。',
              '','| 题目 | 一句话思路 | 容易错的地方 |','|---|---|---|']
     arrays_topic = next(t for t in topics if t['id'] == 'arrays-matrices-03')
@@ -68,4 +77,9 @@ def build():
     print(f"Built {len(all_ids)} problems across {len(topics)} topic(s), including local source snapshots.")
 
 if __name__ == '__main__':
-    build()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--output-dir', type=Path)
+    parser.add_argument('--format', choices=('js', 'json'), default='json')
+    parser.add_argument('--app-url', help='Return link from generated solution pages')
+    args = parser.parse_args()
+    build(args.output_dir, args.format, args.app_url)

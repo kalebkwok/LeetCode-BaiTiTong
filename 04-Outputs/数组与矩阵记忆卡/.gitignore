@@ -18,3 +18,4 @@ frontend/public/content/
 coverage/
 playwright-report/
 test-results/
+launch.local.json

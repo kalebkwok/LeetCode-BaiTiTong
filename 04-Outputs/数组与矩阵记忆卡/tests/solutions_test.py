@@ -3,9 +3,16 @@ import copy
 import json
 import random
 import unittest
+import sys
+import tempfile
 from pathlib import Path
 
-LIB=json.loads((Path(__file__).parents[1]/'dist/cards.js').read_text().removeprefix('window.REVIEW_LIBRARY = ').strip().removesuffix(';'))
+BASE=Path(__file__).resolve().parents[1]
+sys.path.insert(0,str(BASE))
+from build_content import build
+with tempfile.TemporaryDirectory() as output:
+    build(output)
+    LIB=json.loads((Path(output)/'library.json').read_text())
 CARDS={c['id']:c for t in LIB['topics'] for c in t['cards']}
 METHODS={53:'maxSubArray',56:'merge',189:'rotate',238:'productExceptSelf',41:'firstMissingPositive',73:'setZeroes',54:'spiralOrder',48:'rotate',240:'searchMatrix',66:'plusOne',36:'isValidSudoku',57:'insert',435:'eraseOverlapIntervals',252:'canAttendMeetings',253:'minMeetingRooms',1851:'minInterval',43:'multiply'}
 

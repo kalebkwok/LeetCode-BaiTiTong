@@ -298,7 +298,7 @@ class Database:
         uid = self._uid(p.get('uid'))
         kind, ratings = p.get('kind'), p.get('ratings')
         keys = {'recognize', 'explain'} if kind == 'main' else {'implement'} if kind == 'code' else {'explain'}
-        if kind not in KINDS or not isinstance(ratings, dict) or set(ratings) != keys or any(type(v) is not int or v not in (0, 1, 2) for v in ratings.values()):
+        if not isinstance(kind, str) or kind not in KINDS or not isinstance(ratings, dict) or set(ratings) != keys or any(type(v) is not int or v not in (0, 1, 2) for v in ratings.values()):
             raise StoreError('请分别评价本次练到的能力。')
         if type(p.get('practice', False)) is not bool or type(p.get('usedHelp', False)) is not bool:
             raise StoreError('练习状态无效。')
@@ -354,7 +354,7 @@ class Database:
         limit = 1500 if kind == 'note' else 50000
         if not isinstance(text, str) or len(text) > limit:
             raise StoreError(f'内容不能超过 {limit} 个字符。')
-        if kind == 'draft' and p.get('kind') not in KINDS:
+        if kind == 'draft' and (not isinstance(p.get('kind'), str) or p['kind'] not in KINDS):
             raise StoreError('草稿类型无效。')
         query = ('SELECT * FROM notes WHERE uid=?', (uid,)) if kind == 'note' else ('SELECT * FROM drafts WHERE uid=? AND kind=?', (uid, p['kind']))
         old = db.execute(*query).fetchone()
@@ -369,11 +369,11 @@ class Database:
         return {'label': '已保存到本地数据库。', 'uid': uid, 'field': kind, 'at': at}
 
     def _save_settings(self, db, p):
-        if not p or set(p) - set(DEFAULT_SETTINGS):
+        if not isinstance(p, dict) or not p or set(p) - set(DEFAULT_SETTINGS):
             raise StoreError('设置项无效。')
         if 'dailyNewLimit' in p and (type(p['dailyNewLimit']) is not int or not 0 <= p['dailyNewLimit'] <= 20):
             raise StoreError('每日新题数应为 0 到 20；0 表示只复习旧题。')
-        if 'topicId' in p and p['topicId'] not in {v['topicId'] for v in self.catalog.values()}:
+        if 'topicId' in p and (not isinstance(p['topicId'], str) or p['topicId'] not in {v['topicId'] for v in self.catalog.values()}):
             raise StoreError('专题不存在。')
         for k, v in p.items():
             db.execute('INSERT OR REPLACE INTO settings VALUES (?,?)', (k, json.dumps(v)))
@@ -411,7 +411,7 @@ class Database:
         if not isinstance(events, list):
             raise StoreError('备份中的学习历史无效。')
         for e in events:
-            if not isinstance(e, dict) or not isinstance(e.get('id'), str) or not re.fullmatch(r'[a-zA-Z0-9_-]{8,100}', e['id']) or not valid_uid(e.get('uid')) or not valid_time(e.get('at')) or e.get('kind') not in KINDS or not isinstance(e.get('ratings'), dict) or not e['ratings'] or any(k not in SKILLS or type(v) is not int or v not in (0, 1, 2) for k, v in e['ratings'].items()) or (e.get('due') is not None and not valid_time(e['due'])):
+            if not isinstance(e, dict) or not isinstance(e.get('id'), str) or not re.fullmatch(r'[a-zA-Z0-9_-]{8,100}', e['id']) or not valid_uid(e.get('uid')) or not valid_time(e.get('at')) or not isinstance(e.get('kind'), str) or e['kind'] not in KINDS or not isinstance(e.get('ratings'), dict) or not e['ratings'] or any(k not in SKILLS or type(v) is not int or v not in (0, 1, 2) for k, v in e['ratings'].items()) or (e.get('due') is not None and not valid_time(e['due'])):
                 raise StoreError('备份中的学习事件无效。')
             db.execute('INSERT OR IGNORE INTO review_events VALUES (?,?,?,?,?,?,?,?,?,?,?)', (e['id'], e['uid'], e['at'], e['kind'], int(bool(e.get('practice'))), json.dumps(e['ratings']), int(bool(e.get('usedHelp'))), e.get('due'), int(bool(e.get('undone'))), None, None))
 

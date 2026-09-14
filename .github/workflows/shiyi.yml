@@ -1,0 +1,60 @@
+name: Shiyi
+on:
+  pull_request:
+    paths:
+      - '04-Outputs/数组与矩阵记忆卡/**'
+      - '02-Wiki/题目详解/**'
+      - 'docs/shiyi/**'
+      - '.github/workflows/shiyi.yml'
+  push:
+    branches: [main, 'codex/shiyi-*']
+    paths:
+      - '04-Outputs/数组与矩阵记忆卡/**'
+      - '02-Wiki/题目详解/**'
+      - 'docs/shiyi/**'
+      - '.github/workflows/shiyi.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: '04-Outputs/数组与矩阵记忆卡'
+    env:
+      TZ: America/Chicago
+      PYTHONDONTWRITEBYTECODE: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            04-Outputs/数组与矩阵记忆卡/
+            02-Wiki/题目详解/
+            docs/shiyi/
+            .github/workflows/shiyi.yml
+          sparse-checkout-cone-mode: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.19.0'
+          cache: npm
+          cache-dependency-path: '04-Outputs/数组与矩阵记忆卡/frontend/package-lock.json'
+      - name: Install locked dependencies
+        run: |
+          python -m venv .venv
+          .venv/bin/python -m pip install -r requirements.lock
+          npm ci --prefix frontend
+      - name: Build content and frontend
+        run: npm run build --prefix frontend
+      - name: Python and client regressions
+        run: |
+          .venv/bin/python -m unittest discover -s tests -p '*_test.py'
+          npm test --prefix frontend
+      - name: Browser acceptance with temporary data
+        working-directory: '04-Outputs/数组与矩阵记忆卡/frontend'
+        run: |
+          npx playwright install --with-deps chromium
+          npm run test:e2e

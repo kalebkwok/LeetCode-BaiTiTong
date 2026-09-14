@@ -82,4 +82,26 @@ class LearningTest(unittest.TestCase):
         self.assertEqual(d['problems'][0]['activityDays'],['2026-09-12','2026-09-13'])
         self.assertEqual(len(d['today']),1)
 
+    def test_shared_timezone_dst_due_dates_and_calendar_buckets(self):
+        from backend.api import configure_time_zone
+        configure_time_zone('America/Chicago')
+        for start, due in [('2026-03-07T18:00:00+00:00','2026-03-08T17:00:00+00:00'),
+                           ('2026-10-31T17:00:00+00:00','2026-11-01T18:00:00+00:00'),
+                           ('2026-03-07T08:30:00+00:00','2026-03-08T08:30:00+00:00'),
+                           ('2026-10-31T06:30:00+00:00','2026-11-01T06:30:00+00:00')]:
+            with self.subTest(start=start), tempfile.TemporaryDirectory() as directory:
+                self.now=int(datetime.fromisoformat(start).timestamp()*1000)
+                self.db=Database(directory,catalog(),clock=lambda:self.now)
+                result=self.rate()
+                self.assertEqual(result['state']['records']['lc-238']['due'],int(datetime.fromisoformat(due).timestamp()*1000))
+                # Move to the next local calendar midnight, including 23/25-hour days.
+                tomorrow=datetime.combine(datetime.fromtimestamp(self.now/1000).date()+timedelta(days=1),datetime.min.time())
+                self.now=int(tomorrow.timestamp()*1000);self.rate()
+                d=self.db.learning()
+                dates=[datetime.fromisoformat(x['date']).date() for x in d['days']]
+                self.assertEqual(len(set(dates)),7)
+                self.assertTrue(all(b-a==timedelta(days=1) for a,b in zip(dates,dates[1:])))
+                self.assertEqual((d['days'][-2]['total'],d['days'][-1]['total']),(1,1))
+                self.assertEqual(len(d['today']),1)
+
 if __name__=='__main__': unittest.main()
