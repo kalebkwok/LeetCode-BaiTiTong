@@ -142,6 +142,8 @@ npm run build --prefix frontend
 
 ## 共享时区与私有手机入口
 
+手机端可输入控件在 1024px 及以下统一为 16px：iOS Safari 聚焦字号小于 16px 的输入框时会自动放大整页，表现为“打字时画面漂移”。桌面宽度仍保留 13–14px 的紧凑排版。`frontend/e2e/mobile-inputs.spec.mjs` 在 390px 与 844px 两个宽度上守住这条底线。
+
 `start.py` 保留 `--no-open`、`--port`、`--data-dir`，新增 `--time-zone`、`--allow-host`、`--allow-origin`。时间点仍用 Unix 毫秒，学习日、额度和日期筛选统一使用 session 返回的 IANA 时区；10 分钟是经过时间，1/3/7/14/30 天按日历推进，包含夏令时。无效时区拒绝启动，不重写老时间戳。
 
 为日常双击保存配置，可在应用根创建 **被 Git 忽略** 的 `launch.local.json`。它可省略；缺省数据仍是本应用 `data`，时区从主机解析。以下名称仅为示例，部署时替换为实际值：

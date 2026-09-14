@@ -29,3 +29,9 @@
 .conflict-text,.data-path{overflow-wrap:anywhere;white-space:pre-wrap}
 .backup-item{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:16px 0}.backup-item>div{min-width:0}.backup-item span{display:block;overflow-wrap:anywhere}.backup-item button{flex-shrink:0}
 main,.card-body,.map-card{min-width:0}
+
+/* iOS Safari zooms the whole page whenever a focused field computes below
+   16px, which users experience as the screen drifting while typing. Every
+   editable field is therefore at least 16px on phone and tablet widths, in
+   both orientations, while desktop keeps the tighter 13-14px scale. */
+@media(max-width:1024px){input,textarea,select,.scratch textarea,.rating-area textarea,.draft-label textarea,.record-filters input,.record-filters select,.settings-row input,#topic-select{font-size:16px}}

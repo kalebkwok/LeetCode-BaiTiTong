@@ -90,3 +90,11 @@ M5 发布：已按用户授权推送到 `origin`，并把 `main` 快进到 `13ae
 验证：`tsc --noEmit` 无输出；21 项前端单测通过；37 项 Python 通过；Playwright 由 7 项增至 10 项（新增 `frontend/e2e/shortcuts.spec.mjs`：键盘评分与 `Enter` 保存、输入框吞掉快捷键与提示封顶、重复点模式不写入），本机 10/10 通过。新增用例使用 `lc-217` 且文件名排在 `migration.spec.mjs` 之后，避免与既有验收共用同一个临时库时互相影响。
 
 口径更正：`data.days` 的“最近 7 天”是柱状图（无提交的日期以低透明度显示 0），不是可点击的空列表；此前误读为噪音，未做改动。清除备注会在 `notes` 留下一条空文本记录，界面已用 `notes[uid]?.text &&` 过滤，因此未改动 `database.py` 的事务核心。
+
+## 手机端打字漂移修复（用户报告后执行）
+
+用户在手机上打字时画面漂移。根因是 iOS Safari 在聚焦字号小于 16px 的表单控件时会自动放大整页：当时所有可输入控件都是 13–14px（`.draft-label textarea`、`.scratch textarea`、`.rating-area textarea` 为 14px，`.record-filters input/select` 为 13px），因此每次聚焦都会触发缩放。这与应用自身的重渲染无关：`DraftInput` 已用本地状态并在聚焦期间拒绝服务端值覆盖，光标不会被轮询打断。
+
+修复：1024px 及以下把所有可输入控件提升到 16px（覆盖竖屏、横屏手机与平板），桌面宽度保持原样。未改动 `viewport` meta：没有加 `maximum-scale` 或 `user-scalable=no`，保留用户双指缩放，只用字号消除自动缩放。
+
+验证：新增 `frontend/e2e/mobile-inputs.spec.mjs`，在 390px 与 844px 下断言每个可输入控件计算字号 ≥16px。该用例在修复前的样式表上失败（实测报 `review 390px portrait textarea = 14px` 与 `select#topic-select = 14px`），修复后通过，因此它是有效回归防线而非空断言。Playwright 由 10 项增至 11 项，本机 11/11 通过。
