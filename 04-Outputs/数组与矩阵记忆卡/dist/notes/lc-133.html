@@ -1,0 +1,59 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>克隆图 · 原题解</title><style>body{max-width:900px;margin:40px auto;padding:0 22px;color:#172136;background:#f7f9fd;font:16px/1.9 system-ui}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit}a{color:#244bd6}</style><a href="../index.html">返回记忆卡</a><p>本地 Markdown 题解快照；最新版本请在 Obsidian 中查看。</p><pre># 133. 克隆图 (Medium)
+
+&gt; **专题归类：** [[02-Wiki/专题总结/07-图论]]
+&gt; **LeetCode 链接：** https://leetcode.cn/problems/clone-graph/
+
+## 一页复盘
+
+- **题目总结：** 深拷贝图中的全部节点与边，使新图结构相同，但所有节点对象都与原图独立。
+- **重要思考：** 用哈希表保存“原节点 → 克隆节点”；第一次遇到节点时先创建并缓存，再递归克隆邻居，这样才能安全处理环。
+- **必须考虑的情况：**
+  - 输入节点为空时返回空。
+  - 映射键必须是节点对象，而不是只依赖节点值。
+  - 自环、普通环和重复到达同一节点时，都必须复用已经创建的克隆节点。
+
+## 题目目标
+
+深拷贝一个无向连通图。
+
+## 重点
+
+- 哈希表把原节点映射到克隆节点。
+- 创建克隆节点后立刻缓存，才能处理环。
+
+## 时间/空间复杂度
+
+| 项目 | 复杂度 |
+|---|---|
+| 时间复杂度 | O(V+E) |
+| 空间复杂度 | O(V) |
+
+## 代码实现
+
+```python
+class Solution:
+    def cloneGraph(self, node: &#x27;Node | None&#x27;) -&gt; &#x27;Node | None&#x27;:
+        if not node:
+            return None
+        copies = {}
+        def dfs(current):
+            if current in copies:
+                return copies[current]
+            copy = Node(current.val)
+            copies[current] = copy
+            copy.neighbors = [dfs(neighbor) for neighbor in current.neighbors]
+            return copy
+        return dfs(node)
+```
+
+## 易错点与复盘
+
+- 缓存一定在递归邻居之前写入，否则环会无限递归。
+- 不能复用原节点的邻居列表。
+
+## 示例
+
+```text
+1 与 2 互相相连时，克隆后新 1、新 2 也互连，但都不是原对象。
+```
+</pre></html>

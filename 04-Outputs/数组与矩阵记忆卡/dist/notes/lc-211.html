@@ -1,0 +1,71 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>添加与搜索单词 - 数据结构设计 · 原题解</title><style>body{max-width:900px;margin:40px auto;padding:0 22px;color:#172136;background:#f7f9fd;font:16px/1.9 system-ui}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit}a{color:#244bd6}</style><a href="../index.html">返回记忆卡</a><p>本地 Markdown 题解快照；最新版本请在 Obsidian 中查看。</p><pre># 211. 添加与搜索单词 - 数据结构设计 (Medium)
+
+&gt; **专题归类：** [[02-Wiki/专题总结/07-图论]]
+&gt; **LeetCode 链接：** https://leetcode.cn/problems/design-add-and-search-words-data-structure/
+
+## 一页复盘
+
+- **题目总结：** 在 Trie 中添加单词，并支持 `.` 匹配任意一个字符的完整单词查询。
+- **重要思考：** 普通字符沿唯一分支前进；遇到 `.` 时要在当前 Trie 节点的全部孩子上做 DFS，因此查询状态是“Trie 节点 + 模式串下标”。
+- **必须考虑的情况：**
+  - `.` 只匹配一个字符，不是零个或任意多个字符。
+  - 模式串全部匹配后仍需检查结束标记，不能把前缀当作完整单词。
+  - 连续多个 `.` 会产生大量分支，最坏复杂度可能呈指数增长。
+
+## 题目目标
+
+设计单词字典，支持添加单词及包含 `.` 通配符的查询。
+
+## 重点
+
+- Trie 的普通字符沿唯一孩子走；`.` 需要尝试所有孩子。
+- 通配符搜索本质是 Trie 上的 DFS。
+
+## 时间/空间复杂度
+
+| 操作 | 复杂度 |
+|---|---|
+| `addWord` | O(L) |
+| `search` | 最坏 O(26^L) |
+| 空间 | O(总字符数) |
+
+## 代码实现
+
+```python
+class TrieNode:
+    def __init__(self):
+        self.children = {}
+        self.word = False
+
+
+class WordDictionary:
+    def __init__(self):
+        self.root = TrieNode()
+
+    def addWord(self, word: str) -&gt; None:
+        node = self.root
+        for char in word:
+            node = node.children.setdefault(char, TrieNode())
+        node.word = True
+
+    def search(self, word: str) -&gt; bool:
+        def dfs(i: int, node: TrieNode) -&gt; bool:
+            if i == len(word):
+                return node.word
+            if word[i] == &quot;.&quot;:
+                return any(dfs(i + 1, child) for child in node.children.values())
+            return word[i] in node.children and dfs(i + 1, node.children[word[i]])
+        return dfs(0, self.root)
+```
+
+## 易错点与复盘
+
+- 词尾标记不能省略，`bad` 不能因为存在 `badly` 就匹配。
+- `.` 不能只选一个孩子，必须分支搜索。
+
+## 示例
+
+```text
+加入 bad、dad 后，search(&quot;.ad&quot;) 返回 True。
+```
+</pre></html>

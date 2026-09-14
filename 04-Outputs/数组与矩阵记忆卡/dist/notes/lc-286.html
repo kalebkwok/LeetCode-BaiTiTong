@@ -1,0 +1,64 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>墙与门 · 原题解</title><style>body{max-width:900px;margin:40px auto;padding:0 22px;color:#172136;background:#f7f9fd;font:16px/1.9 system-ui}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit}a{color:#244bd6}</style><a href="../index.html">返回记忆卡</a><p>本地 Markdown 题解快照；最新版本请在 Obsidian 中查看。</p><pre># 286. 墙与门 (Medium)
+
+&gt; **专题归类：** [[02-Wiki/专题总结/07-图论]]
+&gt; **LeetCode 链接：** https://leetcode.ca/all/286.html
+
+## 一页复盘
+
+- **题目总结：** 为每个空房间填写到最近门的最短四向距离。
+- **重要思考：** 从每个房间分别找门会重复搜索；把所有门同时作为第 `0` 层做多源 BFS，空房第一次被到达时就是最近距离。
+- **必须考虑的情况：**
+  - 初始化时必须把所有门同时入队。
+  - 只扩展尚未赋值的空房，墙不能穿过，门和已有距离不能覆盖。
+  - 没有门或被墙隔绝的房间要保持 `INF`。
+
+## 题目目标
+
+在房间矩阵中，为每个空房填到最近门的距离；墙和门保持不变。
+
+## 重点
+
+- 所有门同时入队，做多源 BFS。
+- 第一次到达空房的层数就是最近门距离。
+
+## 时间/空间复杂度
+
+| 项目 | 复杂度 |
+|---|---|
+| 时间复杂度 | O(mn) |
+| 空间复杂度 | O(mn) |
+
+## 代码实现
+
+```python
+from collections import deque
+from typing import List
+
+
+class Solution:
+    def wallsAndGates(self, rooms: List[List[int]]) -&gt; None:
+        rows, cols, queue = len(rooms), len(rooms[0]), deque()
+        for r in range(rows):
+            for c in range(cols):
+                if rooms[r][c] == 0:
+                    queue.append((r, c))
+        while queue:
+            r, c = queue.popleft()
+            for dr, dc in ((1,0),(-1,0),(0,1),(0,-1)):
+                nr, nc = r + dr, c + dc
+                if 0 &lt;= nr &lt; rows and 0 &lt;= nc &lt; cols and rooms[nr][nc] == 2147483647:
+                    rooms[nr][nc] = rooms[r][c] + 1
+                    queue.append((nr, nc))
+```
+
+## 易错点与复盘
+
+- 不要从每个空房单独 BFS，会重复搜索。
+- 只扩展初始的无限距离空房，不覆盖墙、门和已填距离。
+
+## 示例
+
+```text
+多个门同时向外扩散，空房首先被哪个门访问就取哪个距离。
+```
+</pre></html>

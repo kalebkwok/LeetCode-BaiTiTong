@@ -1,0 +1,52 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>字符串的排列 · 原题解</title><style>body{max-width:900px;margin:40px auto;padding:0 22px;color:#172136;background:#f7f9fd;font:16px/1.9 system-ui}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit}a{color:#244bd6}</style><a href="../index.html">返回记忆卡</a><p>本地 Markdown 题解快照；最新版本请在 Obsidian 中查看。</p><pre># 567. 字符串的排列 (Medium)
+
+&gt; **专题归类：** [[02-Wiki/专题总结/02-双指针与滑动窗口]]
+&gt; **LeetCode 链接：** https://leetcode.cn/problems/permutation-in-string/
+
+## 题目目标
+
+判断 `s2` 是否包含 `s1` 任意排列形成的连续子串。
+
+## 重点
+
+- 排列要求字符频次相同，所以窗口长度固定为 `len(s1)`。
+- 用 26 位计数数组比较频次。
+
+## 时间/空间复杂度
+
+| 项目 | 复杂度 |
+|---|---|
+| 时间复杂度 | O(n) |
+| 空间复杂度 | O(1) |
+
+## 代码实现
+
+```python
+class Solution:
+    def checkInclusion(self, s1: str, s2: str) -&gt; bool:
+        if len(s1) &gt; len(s2):
+            return False
+        need = [0] * 26
+        window = [0] * 26
+        for char in s1:
+            need[ord(char) - ord(&quot;a&quot;)] += 1
+        for i, char in enumerate(s2):
+            window[ord(char) - ord(&quot;a&quot;)] += 1
+            if i &gt;= len(s1):
+                window[ord(s2[i - len(s1)]) - ord(&quot;a&quot;)] -= 1
+            if window == need:
+                return True
+        return False
+```
+
+## 易错点与复盘
+
+- 加入新字符后，窗口超过固定长度才移出最左字符。
+- 这题找的是连续子串，不是任意子序列。
+
+## 示例
+
+```text
+s1=&quot;ab&quot;, s2=&quot;eidbaooo&quot;，窗口 &quot;ba&quot; 频次匹配，返回 True。
+```
+</pre></html>

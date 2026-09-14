@@ -1,0 +1,50 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>合并若干三元组以形成目标三元组 · 原题解</title><style>body{max-width:900px;margin:40px auto;padding:0 22px;color:#172136;background:#f7f9fd;font:16px/1.9 system-ui}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit}a{color:#244bd6}</style><a href="../index.html">返回记忆卡</a><p>本地 Markdown 题解快照；最新版本请在 Obsidian 中查看。</p><pre># 1899. 合并若干三元组以形成目标三元组 (Medium)
+
+&gt; **专题归类：** [[02-Wiki/专题总结/11-贪心算法]]
+&gt; **LeetCode 链接：** https://leetcode.cn/problems/merge-triplets-to-form-target-triplet/
+
+## 题目目标
+
+每次取三个三元组的逐维最大值，判断能否形成 `target`。
+
+## 重点
+
+- 任一维超过目标的三元组永远不能使用。
+- 在有效三元组中，分别找到能提供 target 三个维度的值即可。
+
+## 时间/空间复杂度
+
+| 项目 | 复杂度 |
+|---|---|
+| 时间复杂度 | O(n) |
+| 空间复杂度 | O(1) |
+
+## 代码实现
+
+```python
+from typing import List
+
+
+class Solution:
+    def mergeTriplets(self, triplets: List[List[int]], target: List[int]) -&gt; bool:
+        matched = [False, False, False]
+        for triplet in triplets:
+            if any(triplet[i] &gt; target[i] for i in range(3)):
+                continue
+            for i in range(3):
+                if triplet[i] == target[i]:
+                    matched[i] = True
+        return all(matched)
+```
+
+## 易错点与复盘
+
+- 不能使用任一维超标的三元组，即使它的其他维度有用。
+- 不必真的模拟全部合并，只需追踪三个目标维度能否分别达成。
+
+## 示例
+
+```text
+[[2,5,3],[1,8,4],[1,7,5]] 可形成 target=[2,7,5]。
+```
+</pre></html>

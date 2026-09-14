@@ -1,0 +1,54 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>包含每个查询的最小区间 · 原题解</title><style>body{max-width:900px;margin:40px auto;padding:0 22px;color:#172136;background:#f7f9fd;font:16px/1.9 system-ui}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit}a{color:#244bd6}</style><a href="../index.html">返回记忆卡</a><p>本地 Markdown 题解快照；最新版本请在 Obsidian 中查看。</p><pre># 1851. 包含每个查询的最小区间 (Hard)
+
+&gt; **专题归类：** [[02-Wiki/专题总结/03-数组与矩阵]] · [[02-Wiki/专题总结/06-栈与堆]]
+&gt; **LeetCode 链接：** https://leetcode.cn/problems/minimum-interval-to-include-each-query/
+
+## 题目目标
+
+对每个查询值，找出包含它的最短区间长度；没有则返回 -1。
+
+## 重点
+
+- 区间按左端点、查询按值排序。
+- 堆存已开始且候选的 `(长度, 右端点)`，先清除右端点过小的区间。
+
+## 时间/空间复杂度
+
+| 项目 | 复杂度 |
+|---|---|
+| 时间复杂度 | O((n+q) log n) |
+| 空间复杂度 | O(n) |
+
+## 代码实现
+
+```python
+import heapq
+from typing import List
+
+
+class Solution:
+    def minInterval(self, intervals: List[List[int]], queries: List[int]) -&gt; List[int]:
+        intervals.sort()
+        answer, heap, i = {}, [], 0
+        for query in sorted(queries):
+            while i &lt; len(intervals) and intervals[i][0] &lt;= query:
+                left, right = intervals[i]
+                heapq.heappush(heap, (right - left + 1, right))
+                i += 1
+            while heap and heap[0][1] &lt; query:
+                heapq.heappop(heap)
+            answer[query] = heap[0][0] if heap else -1
+        return [answer[query] for query in queries]
+```
+
+## 易错点与复盘
+
+- 长度是 `right - left + 1`。
+- 堆顶只保证最短，先删过期区间后才可作为答案。
+
+## 示例
+
+```text
+intervals=[[1,4],[2,4],[3,6],[4,4]]，query=4 的最短区间是 [4,4]，长度 1。
+```
+</pre></html>

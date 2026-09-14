@@ -1,0 +1,65 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>被围绕的区域 · 原题解</title><style>body{max-width:900px;margin:40px auto;padding:0 22px;color:#172136;background:#f7f9fd;font:16px/1.9 system-ui}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit}a{color:#244bd6}</style><a href="../index.html">返回记忆卡</a><p>本地 Markdown 题解快照；最新版本请在 Obsidian 中查看。</p><pre># 130. 被围绕的区域 (Medium)
+
+&gt; **专题归类：** [[02-Wiki/专题总结/07-图论]]
+&gt; **LeetCode 链接：** https://leetcode.cn/problems/surrounded-regions/
+
+## 一页复盘
+
+- **题目总结：** 把没有与边界相连的 `O` 翻成 `X`，本质是区分“边界安全连通块”和“内部封闭连通块”。
+- **重要思考：** 直接判断每块区域是否被包围很绕；应从四条边上的 `O` 反向搜索并暂存为安全标记，最后统一翻转。
+- **必须考虑的情况：**
+  - 边界上的 `O` 以及与它四向连通的所有 `O` 都不能翻转。
+  - 单行或单列棋盘没有真正的内部区域，所有 `O` 都与边界相连。
+  - 最后要完成两步转换：普通 `O → X`，安全标记再恢复为 `O`。
+
+## 题目目标
+
+把所有未与边界相连的 `O` 翻成 `X`。
+
+## 重点
+
+- 不能直接找被围绕区域；从边界 `O` 出发标记安全区域更简单。
+- 最后把未标记 `O` 翻成 `X`，安全标记还原成 `O`。
+
+## 时间/空间复杂度
+
+| 项目 | 复杂度 |
+|---|---|
+| 时间复杂度 | O(mn) |
+| 空间复杂度 | O(mn) |
+
+## 代码实现
+
+```python
+from typing import List
+
+
+class Solution:
+    def solve(self, board: List[List[str]]) -&gt; None:
+        rows, cols = len(board), len(board[0])
+        def dfs(r, c):
+            if not (0 &lt;= r &lt; rows and 0 &lt;= c &lt; cols) or board[r][c] != &quot;O&quot;:
+                return
+            board[r][c] = &quot;S&quot;
+            for dr, dc in ((1,0),(-1,0),(0,1),(0,-1)):
+                dfs(r + dr, c + dc)
+        for r in range(rows):
+            dfs(r, 0); dfs(r, cols - 1)
+        for c in range(cols):
+            dfs(0, c); dfs(rows - 1, c)
+        for r in range(rows):
+            for c in range(cols):
+                board[r][c] = &quot;O&quot; if board[r][c] == &quot;S&quot; else &quot;X&quot;
+```
+
+## 易错点与复盘
+
+- 标记字符需与 `O/X` 不同。
+- 先从边界开始，才能保留所有不该翻转的区域。
+
+## 示例
+
+```text
+边界相连的 O 保留；完全被 X 包围的 O 全部翻转。
+```
+</pre></html>

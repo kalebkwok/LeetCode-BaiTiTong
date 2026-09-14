@@ -1,0 +1,64 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>以图判树 · 原题解</title><style>body{max-width:900px;margin:40px auto;padding:0 22px;color:#172136;background:#f7f9fd;font:16px/1.9 system-ui}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit}a{color:#244bd6}</style><a href="../index.html">返回记忆卡</a><p>本地 Markdown 题解快照；最新版本请在 Obsidian 中查看。</p><pre># 261. 以图判树 (Medium)
+
+&gt; **专题归类：** [[02-Wiki/专题总结/07-图论]]
+&gt; **LeetCode 链接：** https://leetcode.ca/all/261.html
+
+## 一页复盘
+
+- **题目总结：** 判断一个无向图是否同时满足连通且无环，也就是是否为树。
+- **重要思考：** `n` 个节点的无向图是树，当且仅当它有 `n-1` 条边且全部节点连通；先检查边数，再做一次 DFS/BFS 最简洁。
+- **必须考虑的情况：**
+  - 边数少于 `n-1` 一定不连通，多于 `n-1` 一定有环。
+  - 即使边数正好，也要检查是否存在孤立节点或多个连通分量。
+  - 遍历无向图时要用 `visited` 或记录父节点，避免把返回父节点误判为环。
+
+## 题目目标
+
+判断无向图是否是一棵合法树。
+
+## 重点
+
+- `n` 个节点的树必须有 `n-1` 条边。
+- 边数正确后，只需从 0 DFS 验证所有节点连通。
+
+## 时间/空间复杂度
+
+| 项目 | 复杂度 |
+|---|---|
+| 时间复杂度 | O(V+E) |
+| 空间复杂度 | O(V+E) |
+
+## 代码实现
+
+```python
+from collections import defaultdict
+from typing import List
+
+
+class Solution:
+    def validTree(self, n: int, edges: List[List[int]]) -&gt; bool:
+        if len(edges) != n - 1:
+            return False
+        graph = defaultdict(list)
+        for a, b in edges:
+            graph[a].append(b); graph[b].append(a)
+        seen, stack = {0}, [0]
+        while stack:
+            node = stack.pop()
+            for neighbor in graph[node]:
+                if neighbor not in seen:
+                    seen.add(neighbor); stack.append(neighbor)
+        return len(seen) == n
+```
+
+## 易错点与复盘
+
+- 边数 `n-1` 加连通性等价于无环且连通。
+- `n=1`、无边时也是树。
+
+## 示例
+
+```text
+n=5，4 条边且全部节点连通，返回 True。
+```
+</pre></html>

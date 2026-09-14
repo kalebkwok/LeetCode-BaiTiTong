@@ -1,0 +1,50 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>字符串相乘 · 原题解</title><style>body{max-width:900px;margin:40px auto;padding:0 22px;color:#172136;background:#f7f9fd;font:16px/1.9 system-ui}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit}a{color:#244bd6}</style><a href="../index.html">返回记忆卡</a><p>本地 Markdown 题解快照；最新版本请在 Obsidian 中查看。</p><pre># 43. 字符串相乘 (Medium)
+
+&gt; **专题归类：** [[02-Wiki/专题总结/03-数组与矩阵]]
+&gt; **LeetCode 链接：** https://leetcode.cn/problems/multiply-strings/
+
+## 题目目标
+
+不使用大整数库，计算两个非负整数字符串的乘积。
+
+## 重点
+
+- 竖式乘法中 `num1[i] * num2[j]` 影响结果数组的 `i+j+1` 位。
+- 长度为 `m+n` 的数组足够保存结果。
+
+## 时间/空间复杂度
+
+| 项目 | 复杂度 |
+|---|---|
+| 时间复杂度 | O(mn) |
+| 空间复杂度 | O(m+n) |
+
+## 代码实现
+
+```python
+class Solution:
+    def multiply(self, num1: str, num2: str) -&gt; str:
+        if num1 == &quot;0&quot; or num2 == &quot;0&quot;:
+            return &quot;0&quot;
+        result = [0] * (len(num1) + len(num2))
+        for i in range(len(num1) - 1, -1, -1):
+            for j in range(len(num2) - 1, -1, -1):
+                product = (ord(num1[i]) - ord(&quot;0&quot;)) * (ord(num2[j]) - ord(&quot;0&quot;))
+                pos = i + j + 1
+                total = result[pos] + product
+                result[pos] = total % 10
+                result[pos - 1] += total // 10
+        return &quot;&quot;.join(map(str, result)).lstrip(&quot;0&quot;)
+```
+
+## 易错点与复盘
+
+- 乘积要先加上该位置已有的进位值。
+- 去掉前导零后，零乘法必须提前返回，否则会得到空串。
+
+## 示例
+
+```text
+&quot;123&quot; × &quot;45&quot; 按每对数字累加到对应的十进制位，结果为 &quot;5535&quot;。
+```
+</pre></html>

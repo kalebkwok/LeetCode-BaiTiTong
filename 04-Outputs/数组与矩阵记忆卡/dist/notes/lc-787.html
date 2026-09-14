@@ -1,0 +1,60 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>K 站中转内最便宜的航班 · 原题解</title><style>body{max-width:900px;margin:40px auto;padding:0 22px;color:#172136;background:#f7f9fd;font:16px/1.9 system-ui}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit}a{color:#244bd6}</style><a href="../index.html">返回记忆卡</a><p>本地 Markdown 题解快照；最新版本请在 Obsidian 中查看。</p><pre># 787. K 站中转内最便宜的航班 (Medium)
+
+&gt; **专题归类：** [[02-Wiki/专题总结/07-图论]] · [[02-Wiki/专题总结/10-动态规划]]
+&gt; **LeetCode 链接：** https://leetcode.cn/problems/cheapest-flights-within-k-stops/
+
+## 一页复盘
+
+- **题目总结：** 在最多 `k` 个中转站的限制下，求从 `src` 到 `dst` 的最低总价格。
+- **重要思考：** `k` 个中转站等于最多使用 `k+1` 条边；分层 Bellman-Ford 每轮只用上一轮结果，精确控制允许的边数。
+- **必须考虑的情况：**
+  - 每轮必须先复制上一轮距离，不能原地连续松弛，否则同一轮可能使用多条边。
+  - `k = 0` 时只能乘坐直达航班。
+  - 在边数限制内不可达时返回 `-1`；到同一城市但已用边数不同属于不同状态。
+
+## 题目目标
+
+在最多 `k` 个中转站内，从 `src` 到 `dst` 的最便宜航班价格。
+
+## 重点
+
+- `k` 个中转最多使用 `k+1` 条边。
+- Bellman-Ford 每轮只基于上一轮价格，防止同轮用超过限制的边。
+
+## 时间/空间复杂度
+
+| 项目 | 复杂度 |
+|---|---|
+| 时间复杂度 | O((k+1)E) |
+| 空间复杂度 | O(V) |
+
+## 代码实现
+
+```python
+from typing import List
+
+
+class Solution:
+    def findCheapestPrice(self, n: int, flights: List[List[int]], src: int, dst: int, k: int) -&gt; int:
+        prices = [float(&quot;inf&quot;)] * n
+        prices[src] = 0
+        for _ in range(k + 1):
+            next_prices = prices[:]
+            for source, destination, price in flights:
+                if prices[source] != float(&quot;inf&quot;):
+                    next_prices[destination] = min(next_prices[destination], prices[source] + price)
+            prices = next_prices
+        return -1 if prices[dst] == float(&quot;inf&quot;) else prices[dst]
+```
+
+## 易错点与复盘
+
+- 必须复制 `prices`；直接原地更新会在同一轮连续使用多条边。
+- “k 站中转”不是 k 条边，而是 k+1 条航班。
+
+## 示例
+
+```text
+0→1→2，k=1 时允许两条边，若价格 100+100，答案为 200。
+```
+</pre></html>
