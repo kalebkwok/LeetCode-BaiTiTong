@@ -1,0 +1,49 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>最佳买卖股票时机含冷冻期 · 原题解</title><style>body{max-width:900px;margin:40px auto;padding:0 22px;color:#172136;background:#f7f9fd;font:16px/1.9 system-ui}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit}a{color:#244bd6}</style><a href="../index.html">返回记忆卡</a><p>本地 Markdown 题解快照；最新版本请在 Obsidian 中查看。</p><pre># 309. 最佳买卖股票时机含冷冻期 (Medium)
+
+&gt; **专题归类：** [[02-Wiki/专题总结/10-动态规划]]
+&gt; **LeetCode 链接：** https://leetcode.cn/problems/best-time-to-buy-and-sell-stock-with-cooldown/
+
+## 题目目标
+
+卖出股票后必须冷冻一天，求最大利润。
+
+## 重点
+
+- 三个状态：持有 `hold`、卖出当天 `sold`、空仓可买 `rest`。
+- `hold` 只能从昨天持有或昨天可买状态转来，不能从昨天卖出状态买入。
+
+## 时间/空间复杂度
+
+| 项目 | 复杂度 |
+|---|---|
+| 时间复杂度 | O(n) |
+| 空间复杂度 | O(1) |
+
+## 代码实现
+
+```python
+from typing import List
+
+
+class Solution:
+    def maxProfit(self, prices: List[int]) -&gt; int:
+        hold, sold, rest = float(&quot;-inf&quot;), 0, 0
+        for price in prices:
+            previous_hold, previous_sold, previous_rest = hold, sold, rest
+            hold = max(previous_hold, previous_rest - price)
+            sold = previous_hold + price
+            rest = max(previous_rest, previous_sold)
+        return max(sold, rest)
+```
+
+## 易错点与复盘
+
+- 更新状态时必须保存前一天的值，不能串用本轮刚更新的变量。
+- 最终不可能持有股票来获得已实现最大利润。
+
+## 示例
+
+```text
+[1,2,3,0,2]：买 1 卖 2，冷冻，买 0 卖 2，利润 3。
+```
+</pre></html>

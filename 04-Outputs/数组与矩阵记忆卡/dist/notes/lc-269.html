@@ -1,0 +1,62 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>火星词典 · 原题解</title><style>body{max-width:900px;margin:40px auto;padding:0 22px;color:#172136;background:#f7f9fd;font:16px/1.9 system-ui}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit}a{color:#244bd6}</style><a href="../index.html">返回记忆卡</a><p>本地 Markdown 题解快照；最新版本请在 Obsidian 中查看。</p><pre># 269. 火星词典 (Hard)
+
+&gt; **专题归类：** [[02-Wiki/专题总结/07-图论]]
+&gt; **LeetCode 链接：** https://leetcode.ca/all/269.html
+
+## 题目目标
+
+从已按未知字母顺序排序的单词列表，推导一种合法字符顺序。
+
+## 重点
+
+- 相邻单词第一个不同字符给出唯一边 `a → b`。
+- 前长后短且前缀相同时非法；最后用拓扑排序检测环。
+
+## 时间/空间复杂度
+
+| 项目 | 复杂度 |
+|---|---|
+| 时间复杂度 | O(总字符数) |
+| 空间复杂度 | O(字母数 + 边数) |
+
+## 代码实现
+
+```python
+from collections import defaultdict, deque
+from typing import List
+
+
+class Solution:
+    def alienOrder(self, words: List[str]) -&gt; str:
+        graph = {char: set() for word in words for char in word}
+        degree = {char: 0 for char in graph}
+        for first, second in zip(words, words[1:]):
+            if len(first) &gt; len(second) and first.startswith(second):
+                return &quot;&quot;
+            for a, b in zip(first, second):
+                if a != b:
+                    if b not in graph[a]:
+                        graph[a].add(b); degree[b] += 1
+                    break
+        queue = deque(char for char in degree if degree[char] == 0)
+        order = []
+        while queue:
+            char = queue.popleft(); order.append(char)
+            for next_char in graph[char]:
+                degree[next_char] -= 1
+                if degree[next_char] == 0:
+                    queue.append(next_char)
+        return &quot;&quot;.join(order) if len(order) == len(graph) else &quot;&quot;
+```
+
+## 易错点与复盘
+
+- 只比较每对单词的第一个不同字符。
+- 前缀非法需要在逐字符比较前判断。
+
+## 示例
+
+```text
+[&quot;wrt&quot;,&quot;wrf&quot;,&quot;er&quot;,&quot;ett&quot;,&quot;rftt&quot;] 可推出 &quot;wertf&quot;。
+```
+</pre></html>

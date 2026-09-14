@@ -1,0 +1,55 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>太平洋大西洋水流问题 · 原题解</title><style>body{max-width:900px;margin:40px auto;padding:0 22px;color:#172136;background:#f7f9fd;font:16px/1.9 system-ui}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit}a{color:#244bd6}</style><a href="../index.html">返回记忆卡</a><p>本地 Markdown 题解快照；最新版本请在 Obsidian 中查看。</p><pre># 417. 太平洋大西洋水流问题 (Medium)
+
+&gt; **专题归类：** [[02-Wiki/专题总结/07-图论]]
+&gt; **LeetCode 链接：** https://leetcode.cn/problems/pacific-atlantic-water-flow/
+
+## 题目目标
+
+找出既能流向太平洋又能流向大西洋的格子。
+
+## 重点
+
+- 反向思考：从两片海岸向高处 DFS，而不是从每个格子向低处试流。
+- 两次可达集合的交集即答案。
+
+## 时间/空间复杂度
+
+| 项目 | 复杂度 |
+|---|---|
+| 时间复杂度 | O(mn) |
+| 空间复杂度 | O(mn) |
+
+## 代码实现
+
+```python
+from typing import List
+
+
+class Solution:
+    def pacificAtlantic(self, heights: List[List[int]]) -&gt; List[List[int]]:
+        rows, cols = len(heights), len(heights[0])
+        pacific, atlantic = set(), set()
+        def dfs(r, c, seen):
+            seen.add((r, c))
+            for dr, dc in ((1,0),(-1,0),(0,1),(0,-1)):
+                nr, nc = r + dr, c + dc
+                if 0 &lt;= nr &lt; rows and 0 &lt;= nc &lt; cols and (nr, nc) not in seen and heights[nr][nc] &gt;= heights[r][c]:
+                    dfs(nr, nc, seen)
+        for r in range(rows):
+            dfs(r, 0, pacific); dfs(r, cols - 1, atlantic)
+        for c in range(cols):
+            dfs(0, c, pacific); dfs(rows - 1, c, atlantic)
+        return [[r, c] for r in range(rows) for c in range(cols) if (r, c) in pacific and (r, c) in atlantic]
+```
+
+## 易错点与复盘
+
+- 反向 DFS 的高度条件是 `next &gt;= current`。
+- 两海的边界都要作为起点。
+
+## 示例
+
+```text
+同时能反向到达两侧边界的格子才输出。
+```
+</pre></html>

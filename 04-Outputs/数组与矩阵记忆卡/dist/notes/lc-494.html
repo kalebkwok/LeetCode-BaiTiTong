@@ -1,0 +1,52 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>目标和 · 原题解</title><style>body{max-width:900px;margin:40px auto;padding:0 22px;color:#172136;background:#f7f9fd;font:16px/1.9 system-ui}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit}a{color:#244bd6}</style><a href="../index.html">返回记忆卡</a><p>本地 Markdown 题解快照；最新版本请在 Obsidian 中查看。</p><pre># 494. 目标和 (Medium)
+
+&gt; **专题归类：** [[02-Wiki/专题总结/10-动态规划]]
+&gt; **LeetCode 链接：** https://leetcode.cn/problems/target-sum/
+
+## 题目目标
+
+给每个数字加正负号，使总和等于 `target`，求方案数。
+
+## 重点
+
+- 设正数和为 `P`，有 `P = (sum(nums) + target) / 2`。
+- 转成 0/1 背包：选若干数凑出 `P` 的方案数。
+
+## 时间/空间复杂度
+
+| 项目 | 复杂度 |
+|---|---|
+| 时间复杂度 | O(n × P) |
+| 空间复杂度 | O(P) |
+
+## 代码实现
+
+```python
+from typing import List
+
+
+class Solution:
+    def findTargetSumWays(self, nums: List[int], target: int) -&gt; int:
+        total = sum(nums)
+        if abs(target) &gt; total or (total + target) % 2:
+            return 0
+        goal = (total + target) // 2
+        dp = [0] * (goal + 1)
+        dp[0] = 1
+        for num in nums:
+            for value in range(goal, num - 1, -1):
+                dp[value] += dp[value - num]
+        return dp[goal]
+```
+
+## 易错点与复盘
+
+- `total + target` 为奇数时无整数目标和。
+- 0/1 背包必须倒序更新，避免同一个数被重复选择。
+
+## 示例
+
+```text
+[1,1,1,1,1] 组成 3 有 5 种符号方案。
+```
+</pre></html>

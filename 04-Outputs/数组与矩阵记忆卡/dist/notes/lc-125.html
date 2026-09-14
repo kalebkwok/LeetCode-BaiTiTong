@@ -1,0 +1,98 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>验证回文串 · 原题解</title><style>body{max-width:900px;margin:40px auto;padding:0 22px;color:#172136;background:#f7f9fd;font:16px/1.9 system-ui}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit}a{color:#244bd6}</style><a href="../index.html">返回记忆卡</a><p>本地 Markdown 题解快照；最新版本请在 Obsidian 中查看。</p><pre># 125. 验证回文串 (Easy)
+
+&gt; **专题归类：** [[02-Wiki/专题总结/02-双指针与滑动窗口]]
+&gt; **LeetCode 链接：** https://leetcode.cn/problems/valid-palindrome/
+
+---
+
+## 题目目标
+
+给定字符串 `s`，忽略非字母数字字符并忽略大小写后，判断它是否是回文串。
+
+---
+
+## 重点
+
+- 用左右指针从两端向中间收缩。
+- `isalnum()` 决定一个字符是否参与比较；标点和空格只负责被跳过。
+- 每次真正比较前都要统一大小写。
+
+---
+
+## 时间/空间复杂度
+
+| 项目 | 复杂度 |
+|---|---|
+| 时间复杂度 | O(n) |
+| 空间复杂度 | O(1) |
+
+双指针原地扫描，不需要构造过滤后的新字符串。
+
+---
+
+## 解题思路
+
+令 `left` 指向开头、`right` 指向结尾。循环中先把两端的非字母数字字符跳过去；当两端都停在有效字符上时，再比较它们的小写形式。
+
+- 不同：立刻不是回文；
+- 相同：两个指针各向中间移动一步；
+- 指针相遇或交错：所有有效字符都已匹配。
+
+---
+
+## 代码实现
+
+```python
+class Solution:
+    def isPalindrome(self, s: str) -&gt; bool:
+        left, right = 0, len(s) - 1
+
+        while left &lt; right:
+            while left &lt; right and not s[left].isalnum():
+                left += 1
+            while left &lt; right and not s[right].isalnum():
+                right -= 1
+
+            if s[left].lower() != s[right].lower():
+                return False
+
+            left += 1
+            right -= 1
+
+        return True
+```
+
+---
+
+## 易错点与复盘
+
+- **先跳过无效字符，再比较。** 否则空格、逗号会导致误判。
+- 内层跳过循环也要写 `left &lt; right`，避免两指针越过后继续访问。
+- 不要只在一端调用 `lower()`；比较的两端都必须忽略大小写。
+
+---
+
+## 掌握程度
+
+- 当前：🟡 看过
+- 目标：🟢 熟练
+
+---
+
+## 下次复习
+
+对比 125 和有序两数之和：两题都是对撞指针，但 125 的移动规则来自“跳过无效字符”，不是由数值大小决定。
+
+---
+
+## 示例
+
+```text
+s = &quot;A man, a plan, a canal: Panama&quot;
+
+跳过空格、逗号和冒号后，比较序列为：
+a m a n a p l a n a c a n a l p a n a m a
+
+左右始终相等，答案：True
+```
+</pre></html>

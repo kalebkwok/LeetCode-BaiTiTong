@@ -1,0 +1,54 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>一手顺子 · 原题解</title><style>body{max-width:900px;margin:40px auto;padding:0 22px;color:#172136;background:#f7f9fd;font:16px/1.9 system-ui}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit}a{color:#244bd6}</style><a href="../index.html">返回记忆卡</a><p>本地 Markdown 题解快照；最新版本请在 Obsidian 中查看。</p><pre># 846. 一手顺子 (Medium)
+
+&gt; **专题归类：** [[02-Wiki/专题总结/11-贪心算法]]
+&gt; **LeetCode 链接：** https://leetcode.cn/problems/hand-of-straights/
+
+## 题目目标
+
+判断能否把牌分成若干组，每组恰有 `groupSize` 张连续牌。
+
+## 重点
+
+- 总数不能整除组大小时直接失败。
+- 贪心地从当前最小牌开一组，不能跳过它。
+
+## 时间/空间复杂度
+
+| 项目 | 复杂度 |
+|---|---|
+| 时间复杂度 | O(n log n) |
+| 空间复杂度 | O(n) |
+
+## 代码实现
+
+```python
+from collections import Counter
+from typing import List
+
+
+class Solution:
+    def isNStraightHand(self, hand: List[int], groupSize: int) -&gt; bool:
+        if len(hand) % groupSize:
+            return False
+        count = Counter(hand)
+        for start in sorted(count):
+            copies = count[start]
+            if copies:
+                for value in range(start, start + groupSize):
+                    if count[value] &lt; copies:
+                        return False
+                    count[value] -= copies
+        return True
+```
+
+## 易错点与复盘
+
+- 同一最小值有 `copies` 张时，后续每张牌也需要至少 `copies` 张。
+- 排序保证不会留下无法被更小值消化的牌。
+
+## 示例
+
+```text
+[1,2,3,6,2,3,4,7,8], groupSize=3 可分为 [1,2,3]、[2,3,4]、[6,7,8]。
+```
+</pre></html>
