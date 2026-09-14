@@ -93,8 +93,22 @@ M5 发布：已按用户授权推送到 `origin`，并把 `main` 快进到 `13ae
 
 ## 手机端打字漂移修复（用户报告后执行）
 
-用户在手机上打字时画面漂移。根因是 iOS Safari 在聚焦字号小于 16px 的表单控件时会自动放大整页：当时所有可输入控件都是 13–14px（`.draft-label textarea`、`.scratch textarea`、`.rating-area textarea` 为 14px，`.record-filters input/select` 为 13px），因此每次聚焦都会触发缩放。这与应用自身的重渲染无关：`DraftInput` 已用本地状态并在聚焦期间拒绝服务端值覆盖，光标不会被轮询打断。
+### 第一次尝试：字号（真实问题，但不是本次漂移的原因）
 
-修复：1024px 及以下把所有可输入控件提升到 16px（覆盖竖屏、横屏手机与平板），桌面宽度保持原样。未改动 `viewport` meta：没有加 `maximum-scale` 或 `user-scalable=no`，保留用户双指缩放，只用字号消除自动缩放。
+用户在手机上打字时画面漂移。第一次判断为 iOS Safari 在聚焦字号小于 16px 的表单控件时自动放大整页：当时所有可输入控件都是 13–14px（`.draft-label textarea`、`.scratch textarea`、`.rating-area textarea` 为 14px，`.record-filters input/select` 为 13px）。该问题本身真实存在并已修复——1024px 及以下把可输入控件提升到 16px，未改动 `viewport` meta（没有加 `maximum-scale` 或 `user-scalable=no`，保留双指缩放），`frontend/e2e/mobile-inputs.spec.mjs` 在 390px 与 844px 下断言计算字号 ≥16px，该用例在修复前的样式表上确实失败（实测 `review 390px portrait textarea = 14px`、`select#topic-select = 14px`）。
 
-验证：新增 `frontend/e2e/mobile-inputs.spec.mjs`，在 390px 与 844px 下断言每个可输入控件计算字号 ≥16px。该用例在修复前的样式表上失败（实测报 `review 390px portrait textarea = 14px` 与 `select#topic-select = 14px`），修复后通过，因此它是有效回归防线而非空断言。Playwright 由 10 项增至 11 项，本机 11/11 通过。
+但用户复测后漂移依旧，说明字号不是本次的原因。这一步判断错了，保留这段记录以免后人重走。
+
+### 真正的原因：每敲一个字侧栏高度抖动 35px
+
+用户指出出问题的区域是侧栏（“已保存到共享数据库 / 处理待保存内容 / 保存与备份”附近）。用 rAF 逐帧采样实测：`.save-indicator` 高度在 22px 与 57px 之间反复跳变（Δ=35px），跳变周期与击键一一对应。原因是 `处理待保存内容（N）` 按钮按 `store.queue.length>0` 条件渲染，而 `.save-indicator button{display:block}` 让它独占一行：每次入队出现、保存完成消失。草稿是逐字自动保存，于是每敲一个字，侧栏就长高 35px 再缩回。
+
+由于手机端 `.layout` 是单列、侧栏在正文之前，侧栏变高会把下面正在输入的文本框整体推下去。文档坐标实测位移 36px。
+
+为什么之前没发现：Chrome 有滚动锚定（scroll anchoring），会在侧栏变高时自动补偿滚动位置，视口内位移只有 1px；**iOS Safari 不支持滚动锚定**，同样的 36px 位移直接可见。因此该缺陷只在手机上暴露，桌面浏览器和此前的全部 e2e 都无法发现。复现方法是关闭锚定：`html{overflow-anchor:none}`。
+
+修复：该按钮始终渲染、只切换 `visibility`（`visibility:hidden` 仍占位，且天然移出标签页顺序与无障碍树），因此侧栏高度在所有状态下恒定。按需保留重新连接按钮的条件渲染：它只在 `offline`/`blocked`/`conflict` 出现，不属于逐字抖动。代价是手机侧栏常驻多出一行约 35px。
+
+验证：新增 `frontend/e2e/layout-stability.spec.mjs`，在 390×844 下关闭滚动锚定模拟 Safari，打字期间逐帧断言 `.save-indicator` 高度与文本框视口位置位移 ≤1px；第二项用 `page.route` 掐断 `/api/command` 让保存真的卡住，断言被占位的按钮仍会变为可见并能打开对话框（避免“占位”变成功能丢失）。修复前实测 `sidebar save area changed height while typing: Received 35`（失败），修复后 `save-indicator height 57..57 Δ=0`、`textarea viewport top 680..680 Δ=0`、`document top 1139..1139 Δ=0`。Playwright 由 11 项增至 13 项，本机 13/13 通过。
+
+过程教训：第一次负向对照无效——在应用根目录执行 `npm run build` 其实没有重新构建（该目录没有 `package.json`，构建脚本在 `frontend/`），于是“修复前”跑的还是已修复的产物，两次都通过。改用 `cd frontend && npm run build` 后才真正复现失败。断言必须用会失败的对照来证明，而不是用通过的次数。
