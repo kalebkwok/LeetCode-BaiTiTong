@@ -29,18 +29,18 @@ Python 3.13.12、Node 24.19.0；requirements.lock 和 package-lock.json 固定�
 | A01 | database.py；frontend/src/model；所有 React features | database/learning/model 测试保留原排程、能力、额度、统计；浏览器评分/撤销通过 |
 | A02 | api.ts 固定请求体；Database operations | storage 测试及真实 HTTP 提交后丢响应、刷新重试一次通过 |
 | A03 | DraftInput、冲突弹窗、expectedAt | 两独立浏览器上下文分别保留本页/数据库草稿通过 |
-| A04 | React 局部输入、稳定卡片 key、IME/快捷键保护 | 中文文本、composition 事件、焦点、提示、切题及 390px 布局通过；真实手机输入待验 |
+| A04 | React 局部输入、稳定卡片 key、IME/快捷键保护 | 中文文本、composition 事件、焦点、提示、切题及 390px 布局通过；真实手机输入已验：iPhone 经 Tailscale 访问，用 IME 逐字输入中文备注并自动保存，`notes` 表最终存有原文 `检查测试`（4 个汉字，10:05:08） |
 | A05 | Database、DataLease、recover.py | 重启、正常/过期撤销、备份/恢复、损坏归档、恢复后 epoch 测试通过 |
 | A06 | backend/api.py、schemas.py | Host/Origin/token、JSON/严格类型、实际 16 MiB、503、无副作用检查通过 |
 | A07 | API 优先路由、StaticFiles、启动路径校验 | 缺失 API/JSON/JS/题解、路径穿越、data/备份隔离返回真实状态码通过 |
 | A08 | build_content.py、library/solutions 测试 | 177 唯一 UID、12 专题、来源 hash、完整代码、关联和返回根入口通过；保留算法断言 |
-| A09 | 15 秒/focus 同步、共享 SQLite | 本机真实 HTTP 轮询与双上下文通过；本机切换后对真实库的同库读写通过；实际手机/Tailscale 仍未执行 |
+| A09 | 15 秒/focus 同步、共享 SQLite | 本机真实 HTTP 轮询与双上下文通过；真实手机已验：iPhone 经 `tailscale serve` 写入同一 SQLite（验收记录随后已回退），桌面 `127.0.0.1` 与 `*.ts.net` 两个来源同时读到 `revision 236`、`reviewCount 16`、`startedCount 9` 与同一 `databaseId`，桌面端在 15 秒内自行刷新 |
 | A10 | session 时区；time.js；Python 本地日历 | 不同浏览器时区、午夜、DST 23/25 小时与缺失/重复墙上时间通过 |
 | A11 | importQueue、migrateLegacy、导出按钮 | 原队列重试去重、已恢复/缺失 epoch 显式确认、旧原文保留通过 |
 | A12 | 版本/锁文件、start.py、CI、README | 在交付提交 `a20700d` 的独立 clone 中从零复验：新建 `.venv` 并按 `requirements.lock` 安装、`npm ci`、构建（177 题/12 专题、177 个题解文件）、37 项 Python、21 项 JS、7 项 e2e 全部通过；无 node/npm 的最小 PATH 下 `start.py` 正常提供 `/` 与 `/api/session`，数据只写入临时目录；GitHub CI 已在 main 上运行并通过（run 34856369328，提交 0c811b0，全部步骤含浏览器验收）；复验之后仅有本记录的文档变更 |
 | A13 | sparse worktree、忽略规则、精确暂存 | 提交 227 个文件，仅公开源码/题库/测试/配置/文档；树内无 SQLite/WAL/SHM、备份、`data/`、`node_modules`、`.venv`、`frontend/dist`、生成内容、密钥或个人配置；`.github/workflows/shiyi.yml` 原先被 sparse 规则挡在索引之外（`git add` 只给 hint 不报错），已加入 sparse 清单后入库 |
 
-浏览器测试使用临时数据库和隔离 Chrome 上下文，包含实际 15 秒轮询；手机宽度截图仅有人工输入的测试内容。没有接触真实 data、SQLite、备份、草稿或学习进度。
+浏览器测试使用临时数据库和隔离 Chrome 上下文，包含实际 15 秒轮询；手机宽度截图仅有人工输入的测试内容。自动化测试全程没有接触真实 data、SQLite、备份、草稿或学习进度；真实数据只在用户授权后的 M4 切换阶段被读写（见下）。
 
 ## 本轮验证记录
 
@@ -63,14 +63,17 @@ Python 3.13.12、Node 24.19.0；requirements.lock 和 package-lock.json 固定�
 
 - 恢复点：`~/Desktop/shiyi-recovery-2026-09-14/`，位于 30 份轮转目录之外。用 SQLite 在线备份 API 生成快照，`PRAGMA integrity_check` 为 `ok`，sha256 `965bd37474b4db4e88f7de01a05c68ef211d994f918a78c4b8e3e3a9dd206124`；完整保留当时 30 份轮转备份（含 `-wal`/`-shm` 边车，边车可能承载数据）与原应用全部 230 个文件（含 186 个 `dist/` 文件）。
 - 原入口队列处理：先在 127.0.0.1:8765 运行原应用（纯标准库，无需 `.venv`）。处理前后数据库计数完全一致：progress 8、drafts 3、review_events 14、skills 17、operations 200、audit 200、revision 200、databaseId `6d4af0e9-7988-4054-9c29-8786396d9382`，原 origin 无遗留待保存项。
-- 正式切换：原应用目录整体移出（保留在 `.worktrees/.shiyi-old-app/`），`main` 由 `12907ab` 快进到 `13ae1cb`。原应用中 24 个题解的本地改动先用 sha256 证明与提交内容逐字节相同，再清除本地修改标记；合并后逐一复验 24/24 与新入口内容完全一致。其余未提交改动（00-配置、02-Wiki/专题总结 共 28 项）未被触碰。
+- 正式切换：原应用目录整体移出（保留在 `.worktrees/.shiyi-old-app/`），`main` 由 `12907ab` 快进到 `13ae1cb`。原应用中 24 个题解的本地改动先用 sha256 证明与提交内容逐字节相同，再清除本地修改标记；合并后逐一复验 24/24 与新入口内容完全一致。其余未提交改动（00-配置、02-Wiki/专题总结、03-学习笔记 共 28 项）未被触碰。
 - 数据保留：`data/` 未被 git 读写；切换后 `integrity_check` 仍为 `ok`，8/3/14/17/200 计数、`databaseId` 与 `revision 200` 均与切换前相同。
 - 重建与启动：新建 `.venv`、按 `requirements.lock` 安装、`npm ci`、构建 177 题；新入口在与原入口相同的 origin（127.0.0.1:8765）下读到真实 8 条进度、3 条草稿（含草稿原文）与 settings `arrays-matrices-03`/20，`apiVersion 2`、`schemaVersion 1`。
 - 时区：原应用没有服务端学习时区概念（`settings` 仅 topicId/dailyNewLimit）。新增本机 `launch.local.json`（`timeZone: America/Chicago`，已忽略入库），并验证双击 `.command`（不传参数）时 `session.timeZone` 为 `America/Chicago`，与显式 `--time-zone` 一致。
 - 回退材料：上列恢复点目录与 `.worktrees/.shiyi-old-app/`；两者均在忽略目录或工作区缓存位置，不影响仓库与 CI。
+- 跨设备入口：安装 Tailscale（1.102.4）并启用 MagicDNS 与 HTTPS 证书后，`tailscale serve --bg 8765` 把 `https://<host>.<tailnet>.ts.net/` 反代到 127.0.0.1:8765；本机 `launch.local.json` 增加该 `*.ts.net` 的 allowedHosts/allowedOrigins（真实主机名与地址不写入仓库）。验证该 Host/Origin 返回 200，伪造 Host/Origin 返回 403；`/`、`/assets/*`、`/content/library.json`、`/content/notes/lc-1.html` 均返回 200。
+- 真实设备验收（A04/A09）：iPhone 在同一 tailnet 内用 Safari 打开该 HTTPS 地址，读到与桌面相同的进度，提交 `lc-54`、`lc-48` 两次真实复习自评（recognize 2 / explain 2），并用 IME 逐字输入中文备注。两次提交后 `revision 200→236`、`reviewCount 14→16`、`startedCount 8→9`、`operations`/`audit` `200→236`、`progress 8→9`、`notes 0→1`（原文 `检查测试`，含 CJK 字符）、库文件 184320→196608 字节且 sha256 由 `14d1982d…` 变为 `b33e3727…`；桌面端在同一共享 SQLite 上于 15 秒内自行显示该变化。
+- 验收数据回退：上述两次自评与备注属于验收产生的真实写入，已用应用自身的撤销与清空入口回退（三个操作 id 前缀 `doc-clean-`）。回退后 `reviewCount` 与 `startedCount` 回到 14 与 8，`progress` 回到 8（`lc-54` 记录移除），`lc-48` 恢复为验收前的逾期状态，备注文本清空，`revision` 为 239。
 
 ## 交付限制
 
-M4 仅剩真实设备验收：Tailscale 未安装（无 CLI、无应用、无 100.x 地址），而 `start.py` 只监听 127.0.0.1，手机必须经 `tailscale serve` 才能访问，因此实际手机同库读写（A04 真实输入、A09 手机同步）仍未执行。本机切换、原 origin 队列处理、轮转目录外恢复点与真实库同库读写证据已在本机完成，不能用桌面测试替代真实设备。
+M4 已完成：原 origin 队列处理、轮转目录外的经验证恢复点、正式切换、真实手机经 Tailscale 的同库读写与跨设备同步均已有本机证据。未执行的只剩 M5 的公网部署与 PR（`upstream` 未推送），以及在本机之外环境的复验。
 
 M5 发布：已按用户授权推送到 `origin`，并把 `main` 快进到 `13ae1cb`（应用提交 `a20700d` + 本记录及 M4 记录），未创建 PR；`upstream`（mo-lx）未推送，未部署公网。安装、私有入口、切换与分别回退代码/数据库的操作见应用 README。
