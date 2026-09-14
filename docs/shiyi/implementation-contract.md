@@ -1,6 +1,6 @@
 # 拾忆实施与验收记录
 
-以 [spec.md](spec.md) 为准。当前版本已完成 React 根入口和 FastAPI 迁移；真实设备与正式数据切换单独验收。交付提交见下；本轮只在本地实现分支提交，未推送到任何远端，也未创建 PR。
+以 [spec.md](spec.md) 为准。当前版本已完成 React 根入口和 FastAPI 迁移；真实设备与正式数据切换单独验收。交付提交见下；已按用户授权推送到 `origin` 并把 `main` 快进到该提交（未创建 PR，未推送 `upstream`）。
 
 ## 基线与范围
 
@@ -10,7 +10,7 @@
 - 本轮交付分支：`codex/shiyi-a-m0-copy`；交付目录 `.worktrees/shiyi-a-m0-copy`（在原工作树基础上复制后继续实施与验收）。
 - M0：原工作区全部未提交改动保留；仅复制清单内应用/测试/启动器/文档和 24 个公开题解变更。28 项 Python、15 项 JS 基线检查通过，177 题/12 专题、179 个生成文件一致。未访问或复制真实数据。
 - 额外基线导出审计按用户要求中止；干净 checkout 复验改在最终交付提交上进行，结果见下。
-- 应用提交：`a20700d`（`feat(shiyi): migrate application to FastAPI and React`），227 个文件；其后提交只更新本记录。两者均仅存在于本地分支。
+- 应用提交：`a20700d`（`feat(shiyi): migrate application to FastAPI and React`），227 个文件；其后提交只更新本记录。已推送：`origin/main` 与 `origin/codex/shiyi-a-m0-copy` 均为 `0c811b0`。
 
 ## 最终契约
 
@@ -37,7 +37,7 @@ Python 3.13.12、Node 24.19.0；requirements.lock 和 package-lock.json 固定�
 | A09 | 15 秒/focus 同步、共享 SQLite | 本机真实 HTTP 轮询与双上下文通过；实际手机/Tailscale 未执行 |
 | A10 | session 时区；time.js；Python 本地日历 | 不同浏览器时区、午夜、DST 23/25 小时与缺失/重复墙上时间通过 |
 | A11 | importQueue、migrateLegacy、导出按钮 | 原队列重试去重、已恢复/缺失 epoch 显式确认、旧原文保留通过 |
-| A12 | 版本/锁文件、start.py、CI、README | 在交付提交 `a20700d` 的独立 clone 中从零复验：新建 `.venv` 并按 `requirements.lock` 安装、`npm ci`、构建（177 题/12 专题、177 个题解文件）、37 项 Python、21 项 JS、7 项 e2e 全部通过；无 node/npm 的最小 PATH 下 `start.py` 正常提供 `/` 与 `/api/session`，数据只写入临时目录；GitHub CI 仍未在远端运行；复验之后仅有本记录的文档变更 |
+| A12 | 版本/锁文件、start.py、CI、README | 在交付提交 `a20700d` 的独立 clone 中从零复验：新建 `.venv` 并按 `requirements.lock` 安装、`npm ci`、构建（177 题/12 专题、177 个题解文件）、37 项 Python、21 项 JS、7 项 e2e 全部通过；无 node/npm 的最小 PATH 下 `start.py` 正常提供 `/` 与 `/api/session`，数据只写入临时目录；GitHub CI 已在 main 上运行并通过（run 34856369328，提交 0c811b0，全部步骤含浏览器验收）；复验之后仅有本记录的文档变更 |
 | A13 | sparse worktree、忽略规则、精确暂存 | 提交 227 个文件，仅公开源码/题库/测试/配置/文档；树内无 SQLite/WAL/SHM、备份、`data/`、`node_modules`、`.venv`、`frontend/dist`、生成内容、密钥或个人配置；`.github/workflows/shiyi.yml` 原先被 sparse 规则挡在索引之外（`git add` 只给 hint 不报错），已加入 sparse 清单后入库 |
 
 浏览器测试使用临时数据库和隔离 Chrome 上下文，包含实际 15 秒轮询；手机宽度截图仅有人工输入的测试内容。没有接触真实 data、SQLite、备份、草稿或学习进度。
@@ -63,4 +63,4 @@ Python 3.13.12、Node 24.19.0；requirements.lock 和 package-lock.json 固定�
 
 M4 尚未执行：本轮保留禁止访问真实数据的约束；没有实际手机/Tailscale 同库读写、原 origin 队列处理、轮转目录外恢复点及正式切换证据。需在明确授权的本机切换阶段完成，不能用桌面测试替代。
 
-M5 发布：本地交付提交已就绪（见上），但未推送任何远端、未创建 PR；上传与 PR 仍需单独授权。不合并 main，不向 upstream 推送，不部署公网。安装、私有入口、切换与分别回退代码/数据库的操作见应用 README。
+M5 发布：已按用户授权推送到 `origin`，并把 `main` 快进到 `0c811b0`（应用提交 `a20700d` + 本记录），未创建 PR；`upstream`（mo-lx）未推送，未部署公网。安装、私有入口、切换与分别回退代码/数据库的操作见应用 README。
