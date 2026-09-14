@@ -1,6 +1,6 @@
 # 拾忆实施与验收记录
 
-以 [spec.md](spec.md) 为准。当前版本已完成 React 根入口和 FastAPI 迁移；真实设备与正式数据切换单独验收。交付提交见下；已按用户授权推送到 `origin` 并把 `main` 快进到该提交（未创建 PR，未推送 `upstream`）。
+以 [spec.md](spec.md) 为准。当前版本已完成 React 根入口和 FastAPI 迁移，并已在本机完成正式切换（见下）；仅剩真实手机/Tailscale 验收。交付提交见下；已按用户授权推送到 `origin` 并把 `main` 快进到该提交（未创建 PR，未推送 `upstream`）。
 
 ## 基线与范围
 
@@ -10,7 +10,7 @@
 - 本轮交付分支：`codex/shiyi-a-m0-copy`；交付目录 `.worktrees/shiyi-a-m0-copy`（在原工作树基础上复制后继续实施与验收）。
 - M0：原工作区全部未提交改动保留；仅复制清单内应用/测试/启动器/文档和 24 个公开题解变更。28 项 Python、15 项 JS 基线检查通过，177 题/12 专题、179 个生成文件一致。未访问或复制真实数据。
 - 额外基线导出审计按用户要求中止；干净 checkout 复验改在最终交付提交上进行，结果见下。
-- 应用提交：`a20700d`（`feat(shiyi): migrate application to FastAPI and React`），227 个文件；其后提交只更新本记录。已推送：`origin/main` 与 `origin/codex/shiyi-a-m0-copy` 均为 `0c811b0`。
+- 应用提交：`a20700d`（`feat(shiyi): migrate application to FastAPI and React`），227 个文件；其后提交只更新本记录。已推送：`origin/main` 与 `origin/codex/shiyi-a-m0-copy` 均为 `13ae1cb`。
 
 ## 最终契约
 
@@ -34,7 +34,7 @@ Python 3.13.12、Node 24.19.0；requirements.lock 和 package-lock.json 固定�
 | A06 | backend/api.py、schemas.py | Host/Origin/token、JSON/严格类型、实际 16 MiB、503、无副作用检查通过 |
 | A07 | API 优先路由、StaticFiles、启动路径校验 | 缺失 API/JSON/JS/题解、路径穿越、data/备份隔离返回真实状态码通过 |
 | A08 | build_content.py、library/solutions 测试 | 177 唯一 UID、12 专题、来源 hash、完整代码、关联和返回根入口通过；保留算法断言 |
-| A09 | 15 秒/focus 同步、共享 SQLite | 本机真实 HTTP 轮询与双上下文通过；实际手机/Tailscale 未执行 |
+| A09 | 15 秒/focus 同步、共享 SQLite | 本机真实 HTTP 轮询与双上下文通过；本机切换后对真实库的同库读写通过；实际手机/Tailscale 仍未执行 |
 | A10 | session 时区；time.js；Python 本地日历 | 不同浏览器时区、午夜、DST 23/25 小时与缺失/重复墙上时间通过 |
 | A11 | importQueue、migrateLegacy、导出按钮 | 原队列重试去重、已恢复/缺失 epoch 显式确认、旧原文保留通过 |
 | A12 | 版本/锁文件、start.py、CI、README | 在交付提交 `a20700d` 的独立 clone 中从零复验：新建 `.venv` 并按 `requirements.lock` 安装、`npm ci`、构建（177 题/12 专题、177 个题解文件）、37 项 Python、21 项 JS、7 项 e2e 全部通过；无 node/npm 的最小 PATH 下 `start.py` 正常提供 `/` 与 `/api/session`，数据只写入临时目录；GitHub CI 已在 main 上运行并通过（run 34856369328，提交 0c811b0，全部步骤含浏览器验收）；复验之后仅有本记录的文档变更 |
@@ -59,8 +59,18 @@ Python 3.13.12、Node 24.19.0；requirements.lock 和 package-lock.json 固定�
 
 本机 `~/Library/Caches/pip`、`~/.npm` 与 `~/Library/Caches/ms-playwright` 在当前沙箱下不可写；复验时改用工作区内的缓存与 `PLAYWRIGHT_BROWSERS_PATH`，不属于产品缺陷。
 
+## M4 正式切换记录（本机，用户授权后执行）
+
+- 恢复点：`~/Desktop/shiyi-recovery-2026-09-14/`，位于 30 份轮转目录之外。用 SQLite 在线备份 API 生成快照，`PRAGMA integrity_check` 为 `ok`，sha256 `965bd37474b4db4e88f7de01a05c68ef211d994f918a78c4b8e3e3a9dd206124`；完整保留当时 30 份轮转备份（含 `-wal`/`-shm` 边车，边车可能承载数据）与原应用全部 230 个文件（含 186 个 `dist/` 文件）。
+- 原入口队列处理：先在 127.0.0.1:8765 运行原应用（纯标准库，无需 `.venv`）。处理前后数据库计数完全一致：progress 8、drafts 3、review_events 14、skills 17、operations 200、audit 200、revision 200、databaseId `6d4af0e9-7988-4054-9c29-8786396d9382`，原 origin 无遗留待保存项。
+- 正式切换：原应用目录整体移出（保留在 `.worktrees/.shiyi-old-app/`），`main` 由 `12907ab` 快进到 `13ae1cb`。原应用中 24 个题解的本地改动先用 sha256 证明与提交内容逐字节相同，再清除本地修改标记；合并后逐一复验 24/24 与新入口内容完全一致。其余未提交改动（00-配置、02-Wiki/专题总结 共 28 项）未被触碰。
+- 数据保留：`data/` 未被 git 读写；切换后 `integrity_check` 仍为 `ok`，8/3/14/17/200 计数、`databaseId` 与 `revision 200` 均与切换前相同。
+- 重建与启动：新建 `.venv`、按 `requirements.lock` 安装、`npm ci`、构建 177 题；新入口在与原入口相同的 origin（127.0.0.1:8765）下读到真实 8 条进度、3 条草稿（含草稿原文）与 settings `arrays-matrices-03`/20，`apiVersion 2`、`schemaVersion 1`。
+- 时区：原应用没有服务端学习时区概念（`settings` 仅 topicId/dailyNewLimit）。新增本机 `launch.local.json`（`timeZone: America/Chicago`，已忽略入库），并验证双击 `.command`（不传参数）时 `session.timeZone` 为 `America/Chicago`，与显式 `--time-zone` 一致。
+- 回退材料：上列恢复点目录与 `.worktrees/.shiyi-old-app/`；两者均在忽略目录或工作区缓存位置，不影响仓库与 CI。
+
 ## 交付限制
 
-M4 尚未执行：本轮保留禁止访问真实数据的约束；没有实际手机/Tailscale 同库读写、原 origin 队列处理、轮转目录外恢复点及正式切换证据。需在明确授权的本机切换阶段完成，不能用桌面测试替代。
+M4 仅剩真实设备验收：Tailscale 未安装（无 CLI、无应用、无 100.x 地址），而 `start.py` 只监听 127.0.0.1，手机必须经 `tailscale serve` 才能访问，因此实际手机同库读写（A04 真实输入、A09 手机同步）仍未执行。本机切换、原 origin 队列处理、轮转目录外恢复点与真实库同库读写证据已在本机完成，不能用桌面测试替代真实设备。
 
-M5 发布：已按用户授权推送到 `origin`，并把 `main` 快进到 `0c811b0`（应用提交 `a20700d` + 本记录），未创建 PR；`upstream`（mo-lx）未推送，未部署公网。安装、私有入口、切换与分别回退代码/数据库的操作见应用 README。
+M5 发布：已按用户授权推送到 `origin`，并把 `main` 快进到 `13ae1cb`（应用提交 `a20700d` + 本记录及 M4 记录），未创建 PR；`upstream`（mo-lx）未推送，未部署公网。安装、私有入口、切换与分别回退代码/数据库的操作见应用 README。
